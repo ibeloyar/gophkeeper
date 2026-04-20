@@ -27,15 +27,13 @@ func (a app) updateRegister(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case tea.KeyCtrlC:
 			return a, tea.Quit
 
-		case tea.KeyRunes:
-			if len(msg.Runes) > 0 && msg.Runes[0] == 'b' {
-				a.state = loginState
-				a.registerModel.loginInput.SetValue("")
-				a.registerModel.passwordInput.SetValue("")
-				a.registerModel.err = nil
-				return a, nil
-			}
-
+		case tea.KeyCtrlB:
+			a.state = loginState
+			a.registerModel.loginInput.SetValue("")
+			a.registerModel.passwordInput.SetValue("")
+			a.registerModel.err = nil
+			return a, nil
+			
 		case tea.KeyEnter:
 			if a.registerModel.loginInput.Value() != "" && a.registerModel.passwordInput.Value() != "" {
 				var header metadata.MD
@@ -99,7 +97,7 @@ func (a app) registerView() string {
 
 	s += "\n\nIf you already have an account, you can login\n"
 
-	s += "\n> [Enter] – register, [b] – back to login, [Ctrl+C] – quit"
+	s += "\n> [Enter] – register, [Ctrl+B] – back to login, [Ctrl+C] – quit"
 
 	return s
 }

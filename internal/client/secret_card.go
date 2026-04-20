@@ -14,12 +14,10 @@ func (a app) updateSecretCard(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case tea.KeyCtrlC:
 			return a, tea.Quit
 
-		case tea.KeyRunes:
-			if len(msg.Runes) > 0 && msg.Runes[0] == 'b' {
-				a.state = secretsState
-				a.selectedSecret = nil
-				return a, nil
-			}
+		case tea.KeyCtrlB:
+			a.state = secretsState
+			a.selectedSecret = nil
+			return a, nil
 		}
 	}
 
@@ -39,7 +37,7 @@ func (a app) secretCardView() string {
 	}
 
 	if a.selectedSecret.SecretType == gophkeeperv1.SecretType_BINARY {
-		s += fmt.Sprintf("BinaryData: %s\n", a.selectedSecret.BinaryData)
+		s += fmt.Sprintf("BinaryData: file with size %d bytes\n", len(a.selectedSecret.BinaryData))
 	}
 
 	if a.selectedSecret.SecretType == gophkeeperv1.SecretType_CARD {
@@ -48,7 +46,7 @@ func (a app) secretCardView() string {
 		s += fmt.Sprintf("Card exp: %s\n", a.selectedSecret.CardExp)
 	}
 
-	s += "\n[b] – back in secrets, [Ctrl+C] – quit\n"
+	s += "\n[Ctrl+B] – back in secrets, [Ctrl+C] – quit\n"
 
 	return s
 }

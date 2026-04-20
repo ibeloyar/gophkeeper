@@ -30,7 +30,7 @@ func (a app) updateLogin(msg tea.Msg) (tea.Model, tea.Cmd) {
 			a.loginModel.passwordInput.SetValue("")
 			a.loginModel.err = nil
 
-		case tea.KeyCtrlC, tea.KeyEsc:
+		case tea.KeyCtrlC:
 			return a, tea.Quit
 
 		case tea.KeyEnter:

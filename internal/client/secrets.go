@@ -25,7 +25,6 @@ func (a app) updateSecrets(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.Type {
-
 		case tea.KeyRunes:
 			if len(msg.Runes) > 0 && msg.Runes[0] == 'l' {
 				a.state = secretLogPassCreateState
@@ -62,7 +61,7 @@ func (a app) updateSecrets(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case tea.KeyDown:
 			a.secretsModel.err = nil
-			
+
 			if a.secretsCursor < len(a.secrets)-1 {
 				a.secretsCursor++
 			}

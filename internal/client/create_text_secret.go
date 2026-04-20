@@ -1,7 +1,11 @@
 package main
 
 import (
+	"context"
+	"errors"
+
 	"github.com/charmbracelet/bubbles/textinput"
+	"google.golang.org/grpc/metadata"
 
 	tea "github.com/charmbracelet/bubbletea"
 	gophkeeperv1 "github.com/ibeloyar/gophkeeper/proto/gophkeeper/v1"
@@ -17,18 +21,43 @@ type createTextSecretModel struct {
 
 func (a app) updateCreateTextSecret(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
-	
+
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.Type {
 		case tea.KeyCtrlC:
 			return a, tea.Quit
-		case tea.KeyRunes:
-			if len(msg.Runes) > 0 && msg.Runes[0] == 'b' {
-				a.state = secretsState
-				a.selectedSecret = nil
-				return a, nil
+
+		case tea.KeyCtrlB:
+			a.state = secretsState
+			a.selectedSecret = nil
+			return a, nil
+
+		case tea.KeyEnter:
+			if a.createTextSecretModel.title.Value() == "" {
+				a.createTextSecretModel.err = errors.New("title is required")
 			}
+			if a.createTextSecretModel.textData.Value() == "" {
+				a.createTextSecretModel.err = errors.New("text data is required")
+			}
+
+			ctx := metadata.AppendToOutgoingContext(context.Background(), "Authorization", a.token)
+
+			_, err := a.client.Cmd.CreateSecret(ctx, &gophkeeperv1.CreateSecretRequest{
+				Title:      a.createTextSecretModel.title.Value(),
+				Metadata:   a.createTextSecretModel.metadata.Value(),
+				SecretType: gophkeeperv1.SecretType_TEXT,
+				TextData:   a.createTextSecretModel.textData.Value(),
+			})
+			if err != nil {
+				a.secretsModel.err = err
+			}
+
+			a.state = secretsState
+			a.createTextSecretModel.title.SetValue("")
+			a.createTextSecretModel.metadata.SetValue("")
+			a.createTextSecretModel.textData.SetValue("")
+			return a, a.pollSecrets()
 
 		case tea.KeyUp:
 			fallthrough
@@ -88,7 +117,7 @@ func (a app) createTextSecretView() string {
 		s += "\nError: " + a.createTextSecretModel.err.Error() + "\n"
 	}
 
-	s += "\n[b] - back in secrets, [Enter] - create, [Ctrl+C] – quit \n"
+	s += "\n[Ctrl+B] - back in secrets, [Enter] - create, [Ctrl+C] – quit \n"
 
 	return s
 }

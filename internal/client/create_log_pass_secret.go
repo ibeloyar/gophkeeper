@@ -3,10 +3,8 @@ package main
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/charmbracelet/bubbles/textinput"
-	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -30,15 +28,15 @@ func (a app) updateCreateLogPassSecret(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.Type {
 		case tea.KeyCtrlC:
 			return a, tea.Quit
-		case tea.KeyRunes:
-			if len(msg.Runes) > 0 && msg.Runes[0] == 'b' {
-				a.state = secretsState
-				a.selectedSecret = nil
-				return a, nil
-			}
+
+		case tea.KeyCtrlB:
+			a.state = secretsState
+			a.selectedSecret = nil
+			return a, nil
+
 		case tea.KeyEnter:
 			if a.createLogPassSecretModel.title.Value() == "" {
-				a.createLogPassSecretModel.err = errors.New("tilte is required")
+				a.createLogPassSecretModel.err = errors.New("title is required")
 			}
 			if a.createLogPassSecretModel.login.Value() == "" {
 				a.createLogPassSecretModel.err = errors.New("login is required")
@@ -47,30 +45,26 @@ func (a app) updateCreateLogPassSecret(msg tea.Msg) (tea.Model, tea.Cmd) {
 				a.createLogPassSecretModel.err = errors.New("password is required")
 			}
 
-			var header metadata.MD
+			ctx := metadata.AppendToOutgoingContext(context.Background(), "Authorization", a.token)
 
-			_, err := a.client.Cmd.CreateSecret(context.Background(), &gophkeeperv1.CreateSecretRequest{
+			_, err := a.client.Cmd.CreateSecret(ctx, &gophkeeperv1.CreateSecretRequest{
 				Title:      a.createLogPassSecretModel.title.Value(),
 				Metadata:   a.createLogPassSecretModel.metadata.Value(),
 				SecretType: gophkeeperv1.SecretType_LOGIN_PASSWORD,
 				Login:      a.createLogPassSecretModel.login.Value(),
 				Password:   a.createLogPassSecretModel.password.Value(),
-			}, grpc.Header(&header))
+			})
 
 			if err != nil {
-				a.registerModel.err = err
-			} else {
-				headersList := header.Get("token")
-
-				if len(headersList) == 0 {
-					a.registerModel.err = fmt.Errorf("token not found")
-				}
-
-				a.state = secretsState
-				a.registerModel.err = nil
-				a.token = headersList[0]
-				return a, a.pollSecrets()
+				a.secretsModel.err = err
 			}
+
+			a.state = secretsState
+			a.createLogPassSecretModel.title.SetValue("")
+			a.createLogPassSecretModel.metadata.SetValue("")
+			a.createLogPassSecretModel.login.SetValue("")
+			a.createLogPassSecretModel.password.SetValue("")
+			return a, a.pollSecrets()
 
 		case tea.KeyUp:
 			fallthrough
@@ -140,7 +134,7 @@ func (a app) createLogPassSecretView() string {
 		s += "\nError: " + a.createLogPassSecretModel.err.Error() + "\n"
 	}
 
-	s += "\n[b] - back in secrets, [Enter] - create, [Ctrl+C] – quit \n"
+	s += "\n[Ctrl+B] - back in secrets, [Enter] - create, [Ctrl+C] – quit \n"
 
 	return s
 }
