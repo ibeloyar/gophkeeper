@@ -151,6 +151,16 @@ func (s *Service) GetSecrets(ctx context.Context, userID int64) ([]*model.Secret
 		return nil, err
 	}
 
+	for _, secret := range secrets {
+		if secret.SecretType == model.SecretTypeLoginPassword {
+			decryptedPassword, err := password.DecryptPassword(secret.Password, s.secretPasswordKey)
+			if err != nil {
+				return nil, model.ErrServerInternal
+			}
+			secret.Password = decryptedPassword
+		}
+	}
+
 	return secrets, nil
 }
 

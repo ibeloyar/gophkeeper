@@ -3,9 +3,7 @@ package auth
 import (
 	"context"
 	"fmt"
-	"io"
 	"net/http"
-	"net/http/httptest"
 	"slices"
 	"strings"
 	"time"
@@ -95,14 +93,6 @@ func GetTokenInfo[T any](r *http.Request) *T {
 	}
 
 	return tokenInfo
-}
-
-func NewAuthenticatedRequest[T any](method, url string, tokenInfo *T, body io.Reader) *http.Request {
-	req := httptest.NewRequest(method, url, body)
-
-	ctx := context.WithValue(req.Context(), tokenDataContextKey, tokenInfo)
-
-	return req.WithContext(ctx)
 }
 
 func GetTokenInfoFromContext[T any](ctx context.Context) *T {

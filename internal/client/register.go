@@ -33,7 +33,7 @@ func (a app) updateRegister(msg tea.Msg) (tea.Model, tea.Cmd) {
 			a.registerModel.passwordInput.SetValue("")
 			a.registerModel.err = nil
 			return a, nil
-			
+
 		case tea.KeyEnter:
 			if a.registerModel.loginInput.Value() != "" && a.registerModel.passwordInput.Value() != "" {
 				var header metadata.MD

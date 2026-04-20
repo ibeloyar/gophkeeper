@@ -135,6 +135,21 @@ install-mock-tools:
 .PHONY: install-all-tools
 install-all-tools: install-proto-tools install-mock-tools install-pg-tools
 
+.PHONY: test
+test:
+	go test -v ./... | { grep -v 'no test files'; true; }
+
+.PHONY: test_cover
+test_cover:
+	go test -coverprofile=coverage.out ./...
+	cat coverage.out | grep -v '/mocks\|/test\|/vendor\|/internal/model\|/proto' > coverage.filtered.out
+	go tool cover -func=coverage.filtered.out
+	rm coverage.out coverage.filtered.out
+
+.PHONY: gofmt
+gofmt:
+	@gofmt -w ./..
+
 CYAN := \033[36m
 BOLD := \033[1m
 NO_COLOR := \033[0m
@@ -147,3 +162,5 @@ help:
 	@echo "command           | description"
 	@echo "===================================================="
 	@echo "proto             | generate proto files"
+	@echo "test              | run tests"
+	@echo "test_cover        | run tests with coverage"
