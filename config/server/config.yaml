@@ -1,0 +1,17 @@
+grpc_server:
+  addr: ":50022"
+
+database:
+  dsn: "postgres://gophkeeper:gophkeeper@192.168.0.105:5432/gophkeeper?sslmode=disable"
+
+security:
+  user_password_cost: 3
+  token_secret: "secret"
+  token_lifetime: 1h
+  secret_password_key: "12345678901234567890123456789012" # 32 bytes AES‑256
+
+swagger:
+  enabled: false
+  json_path: "./api/apidocs.swagger.json"
+
+
