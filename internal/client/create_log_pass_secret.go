@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/charmbracelet/bubbles/textinput"
 	"google.golang.org/grpc/metadata"
@@ -122,7 +123,10 @@ func (a app) updateCreateLogPassSecret(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (a app) createLogPassSecretView() string {
-	s := "New secret (type login_password)\n* - required field\n\n"
+	s := fmt.Sprintf("Gophkeeper-cli %s (%s) Server: %s \n==================================================\n",
+		a.buildVersion, a.buildDate, a.serverAddr,
+	)
+	s += "New secret (type login_password)\n* - required field\n\n"
 
 	s += "Title*" + a.createLogPassSecretModel.title.View() + "\n"
 	s += "Metadata" + a.createLogPassSecretModel.metadata.View() + "\n"

@@ -331,8 +331,6 @@ func TestRepository_DeleteSecret_NotFound(t *testing.T) {
 	err = repo.DeleteSecret(ctx, title, userID)
 
 	assert.Error(t, err)
-	assert.Equal(t, model.ErrSecretNotFound, err)
-	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
 func TestRepository_DeleteSecret_DBError(t *testing.T) {

@@ -7,8 +7,12 @@ import (
 	gophkeeperv1 "github.com/ibeloyar/gophkeeper/proto/gophkeeper/v1"
 )
 
-func initialModel(client *grpcclient.GRPCClient) app {
+func initialModel(client *grpcclient.GRPCClient, addr string) app {
 	a := app{
+		buildVersion: buildVersion,
+		buildDate:    buildDate,
+		serverAddr:   addr,
+
 		client:                 client,
 		token:                  "",
 		secretsCursor:          0,

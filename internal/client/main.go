@@ -27,7 +27,16 @@ const (
 	secretDeleteState
 )
 
+var (
+	buildVersion = "N/A"
+	buildDate    = "N/A"
+)
+
 type app struct {
+	buildVersion string
+	buildDate    string
+	serverAddr   string
+
 	client                 *grpcclient.GRPCClient
 	state                  state
 	token                  string
@@ -108,14 +117,14 @@ func (a app) View() string {
 }
 
 func main() {
-	cfg, err := config.Read("../../config/client/config.yaml")
+	cfg, err := config.Read()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	grpcClient := grpcclient.New(cfg.GrpcServer.Addr)
+	grpcClient := grpcclient.New(cfg.Addr)
 
-	p := tea.NewProgram(initialModel(grpcClient))
+	p := tea.NewProgram(initialModel(grpcClient, cfg.Addr))
 	if _, err := p.Run(); err != nil {
 		grpcClient.Close()
 		fmt.Printf("Alas, there's been an error: %v", err)

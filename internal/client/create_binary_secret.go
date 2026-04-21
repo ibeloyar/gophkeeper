@@ -128,7 +128,10 @@ func (a app) updateCreateBinarySecret(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (a app) createBinarySecretView() string {
-	s := "New secret (type binary)\n* - required field\n\n"
+	s := fmt.Sprintf("Gophkeeper-cli %s (%s) Server: %s \n==================================================\n",
+		a.buildVersion, a.buildDate, a.serverAddr,
+	)
+	s += "New secret (type binary)\n* - required field\n\n"
 
 	s += "Title*" + a.createBinarySecretModel.title.View() + "\n"
 	s += "Metadata" + a.createBinarySecretModel.metadata.View() + "\n"

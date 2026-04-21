@@ -99,6 +99,22 @@ proto: install-proto-tools
 		--openapiv2_opt allow_merge=true \
 		$(PROTO_V1_DIR)/$(APP_NAME).proto
 
+BINARY_NAME ?= gophkeeper-cli
+BUILD_VERSION ?= v1.0.0
+BUILD_DATE ?= 2026-03-04
+GRPC_SERVER_ADDR ?= :8080
+LDFLAGS = -X main.buildVersion=$(BUILD_VERSION) -X main.buildDate=$(BUILD_DATE)
+.PHONY: build
+build:
+	@echo "Building Linux..."
+	GOOS=linux GOARCH=amd64 go build -ldflags="$(LDFLAGS)" -o ./cmd/client/$(BINARY_NAME)-linux   ./internal/client
+
+	@echo "Building macOS..."
+	GOOS=darwin  GOARCH=amd64 go build -ldflags="$(LDFLAGS)" -o ./cmd/client/$(BINARY_NAME)-darwin  ./internal/client
+
+	@echo "Building Windows..."
+	GOOS=windows GOARCH=amd64 go build -ldflags="$(LDFLAGS)" -o ./cmd/client/$(BINARY_NAME)-win.exe ./internal/client
+
 .PHONY: migrate-up
 migrate-up:
 	migrate \

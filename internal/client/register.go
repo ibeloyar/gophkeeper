@@ -86,7 +86,10 @@ func (a app) updateRegister(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (a app) registerView() string {
-	s := "Registration\n* - required field\n\n"
+	s := fmt.Sprintf("Gophkeeper-cli %s (%s) Server: %s \n==================================================\n",
+		a.buildVersion, a.buildDate, a.serverAddr,
+	)
+	s += "Registration\n* - required field\n\n"
 
 	s += "Login* " + a.registerModel.loginInput.View() + "\n"
 	s += "Password* " + a.registerModel.passwordInput.View() + "\n"

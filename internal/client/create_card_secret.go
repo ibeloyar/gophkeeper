@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/charmbracelet/bubbles/textinput"
 	"google.golang.org/grpc/metadata"
@@ -137,7 +138,10 @@ func (a app) updateCreateCardSecret(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (a app) createCardSecretView() string {
-	s := "New secret (type card)\n* - required field\n\n"
+	s := fmt.Sprintf("Gophkeeper-cli %s (%s) Server: %s \n==================================================\n",
+		a.buildVersion, a.buildDate, a.serverAddr,
+	)
+	s += "New secret (type card)\n* - required field\n\n"
 
 	s += "Title*" + a.createCardSecretModel.title.View() + "\n"
 	s += "Metadata" + a.createCardSecretModel.metadata.View() + "\n"

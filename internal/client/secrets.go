@@ -95,7 +95,10 @@ func (a app) updateSecrets(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (a app) secretsView() string {
-	s := "Secrets list:\n\n"
+	s := fmt.Sprintf("Gophkeeper-cli %s (%s) Server: %s \n==================================================\n",
+		a.buildVersion, a.buildDate, a.serverAddr,
+	)
+	s += "Secrets list:\n\n"
 
 	for i, choice := range a.secrets {
 		cursor := " "

@@ -65,6 +65,8 @@ func (a app) updateLogin(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case tea.KeyDown:
 			fallthrough
 		case tea.KeyTab:
+			fallthrough
+		case tea.KeyShiftTab:
 			if a.loginModel.loginInput.Focused() {
 				a.loginModel.loginInput.Blur()
 				a.loginModel.passwordInput.Focus()
@@ -85,7 +87,10 @@ func (a app) updateLogin(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (a app) loginView() string {
-	s := "Login\n* - required field\n\n"
+	s := fmt.Sprintf("Gophkeeper-cli %s (%s) Server: %s \n==================================================\n",
+		a.buildVersion, a.buildDate, a.serverAddr,
+	)
+	s += "Login\n* - required field\n\n"
 
 	s += "Login* " + a.loginModel.loginInput.View() + "\n"
 	s += "Password* " + a.loginModel.passwordInput.View() + "\n"

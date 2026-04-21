@@ -42,7 +42,10 @@ func (a app) updateSecretDelete(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (a app) secretDeleteView() string {
-	s := "Delete secret\n\n"
+	s := fmt.Sprintf("Gophkeeper-cli %s (%s) Server: %s \n==================================================\n",
+		a.buildVersion, a.buildDate, a.serverAddr,
+	)
+	s += "Delete secret\n\n"
 
 	s += fmt.Sprintf("Are you sure you want to delete the secret %s?\n\n", a.selectedSecret.Title)
 

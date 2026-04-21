@@ -25,7 +25,10 @@ func (a app) updateSecretCard(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (a app) secretCardView() string {
-	s := fmt.Sprintf("Secret: %s\n\n", a.selectedSecret.Title)
+	s := fmt.Sprintf("Gophkeeper-cli %s (%s) Server: %s \n==================================================\n",
+		a.buildVersion, a.buildDate, a.serverAddr,
+	)
+	s += fmt.Sprintf("Secret: %s\n\n", a.selectedSecret.Title)
 
 	if a.selectedSecret.SecretType == gophkeeperv1.SecretType_LOGIN_PASSWORD {
 		s += fmt.Sprintf("Login: %s\n", a.selectedSecret.Login)
