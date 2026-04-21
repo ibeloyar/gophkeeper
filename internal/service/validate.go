@@ -17,7 +17,7 @@ const (
 )
 
 func validateLoginDTO(input *model.LoginDTO) error {
-	if err := validateLogin(input.Password); err != nil {
+	if err := validateLogin(input.Login); err != nil {
 		return err
 	}
 
@@ -29,7 +29,7 @@ func validateLoginDTO(input *model.LoginDTO) error {
 }
 
 func validateRegisterDTO(input *model.RegisterDTO) error {
-	if err := validateLogin(input.Password); err != nil {
+	if err := validateLogin(input.Login); err != nil {
 		return err
 	}
 
