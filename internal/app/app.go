@@ -65,7 +65,7 @@ func Run(cfg *config.Config) error {
 
 	var httpServer *http.Server
 	if cfg.HttpServer.Addr != "" {
-		httpServer, err = buildHTTPServer(lg, appService, cfg.HttpServer.Addr, cfg.Security.TokenSecret)
+		httpServer, err = buildHTTPServer(lg, appService, cfg)
 		if err != nil {
 			return err
 		}
