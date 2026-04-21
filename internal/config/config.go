@@ -14,6 +14,10 @@ type Config struct {
 		Addr string `yaml:"addr"`
 	} `yaml:"grpc_server"`
 
+	HttpServer struct {
+		Addr string `yaml:"addr"`
+	} `yaml:"http_server"`
+
 	Database struct {
 		DSN string `yaml:"dsn"`
 	} `yaml:"database"`
