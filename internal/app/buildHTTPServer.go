@@ -13,6 +13,11 @@ import (
 )
 
 func buildHTTPServer(lg *zap.SugaredLogger, appService *service.Service, addr, tokenSecret string) (*http.Server, error) {
+	controller := httpController.New(lg, appService)
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("POST /api/v1/register", controller.Register)
+	mux.HandleFunc("POST /api/v1/login", controller.Login)
 	//if c.cfg.Swagger.Enabled {
 	//	switch r.URL.Path {
 	//	case "/swagger/doc.json":
@@ -34,21 +39,11 @@ func buildHTTPServer(lg *zap.SugaredLogger, appService *service.Service, addr, t
 	//	}
 	//}
 
-	controller := httpController.New(lg, appService)
-
-	// Общий mux для всего HTTP
-	mux := http.NewServeMux()
-
-	// Публичные эндпоинты — без auth
-	mux.HandleFunc("POST /api/v1/register", controller.Register)
-	mux.HandleFunc("POST /api/v1/login", controller.Login)
-
-	// Закрытые эндпоинты (будут за middleware)
 	protected := http.NewServeMux()
 
 	// protected.HandleFunc("/api/v1/secrets-create", controller.CreateSecret)
 	// protected.HandleFunc("/api/v1/secrets", controller.GetSecrets)
-	// protected.HandleFunc("/api/v1/secret", controller.GetSecret)
+	protected.HandleFunc("POST /api/v1/get-secret", controller.GetSecret)
 	// protected.HandleFunc("/api/v1/secret", controller.DeleteSecret)
 
 	// Middleware: auth + protected mux

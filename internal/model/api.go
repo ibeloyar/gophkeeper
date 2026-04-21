@@ -14,3 +14,7 @@ type RegisterDTO struct {
 	Login    string `json:"login"`
 	Password string `json:"password"`
 }
+
+type GetSecretBody struct {
+	Title string `json:"title"`
+}

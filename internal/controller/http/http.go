@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/ibeloyar/gophkeeper/internal/model"
+	"github.com/ibeloyar/gophkeeper/pgk/auth"
 	"go.uber.org/zap"
 )
 
@@ -81,4 +82,28 @@ func (c *Controller) Login(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Authorization", bearerToken)
 	w.WriteHeader(http.StatusOK)
+}
+
+func (c *Controller) GetSecret(w http.ResponseWriter, r *http.Request) {
+	tokenInfo := auth.GetTokenInfo[model.TokenInfo](r)
+
+	body, err := readBody[model.GetSecretBody](r)
+	if err != nil {
+		c.lg.Errorf("failed to parse request body: %v", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	secret, err := c.service.GetSecret(context.Background(), body.Title, tokenInfo.ID)
+	if err != nil {
+		if errors.Is(err, model.ErrSecretNotFound) {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
+		c.lg.Errorf("GetSecret error: %v", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	writeJSON(w, c.lg, secret, http.StatusOK)
 }

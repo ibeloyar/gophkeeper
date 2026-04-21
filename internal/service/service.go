@@ -129,6 +129,9 @@ func (s *Service) GetSecret(ctx context.Context, title string, userID int64) (*m
 	if err != nil {
 		return nil, err
 	}
+	if secret == nil {
+		return nil, model.ErrSecretNotFound
+	}
 
 	if secret.SecretType == model.SecretTypeLoginPassword {
 		decryptedPassword, err := password.DecryptPassword(secret.Password, s.secretPasswordKey)
