@@ -69,7 +69,7 @@ func (s *PGStorage) CreateSecret(ctx context.Context, secret *model.CreateSecret
 	var id int64
 
 	q := `INSERT INTO secrets (user_id,title,metadata,secret_type,login,password_hash,
-			text_data,binary_data,card_number,card_exp,card_holder
+                     text_data,binary_data,card_number,card_exp,card_holder
 		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id;`
 
 	if err := s.db.QueryRowContext(ctx, q, secret.UserID, secret.Title, secret.Metadata, string(secret.SecretType),
