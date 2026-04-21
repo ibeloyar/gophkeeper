@@ -131,6 +131,7 @@ install-pg-tools:
 .PHONY: install-mock-tools
 install-mock-tools:
 	go install github.com/golang/mock/mockgen@latest  # mocks for tests
+	go install github.com/golang/mock/gomock@latest
 
 .PHONY: install-all-tools
 install-all-tools: install-proto-tools install-mock-tools install-pg-tools
@@ -145,6 +146,13 @@ test_cover:
 	cat coverage.out | grep -v '/mocks\|/test\|/vendor\|/internal/model\|/proto' > coverage.filtered.out
 	go tool cover -func=coverage.filtered.out
 	rm coverage.out coverage.filtered.out
+
+.PHONY: mock
+mock:
+	@echo "Generating mock for Storage..."
+	mockgen -destination=internal/repository/pgstorage/mocks/pgstorage_mock.go -package=pgstorage -source=internal/service/service.go Storage
+	@echo "Generating mock for Service..."
+	mockgen -destination=internal/service/mocks/service_mock.go -package=service -source=internal/controller/grpc/grpc.go Service
 
 .PHONY: gofmt
 gofmt:

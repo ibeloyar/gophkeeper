@@ -111,8 +111,8 @@ func Run(cfg *config.Config) error {
 	stop := make(chan struct{})
 
 	go func() {
-		if shutdownServiceErr := appService.Shutdown(context.Background()); shutdownServiceErr != nil {
-			lg.Errorf("shutdown error: %s", shutdownServiceErr)
+		if shutdownStorageErr := pgStorage.Shutdown(); shutdownStorageErr != nil {
+			lg.Errorf("shutdown error: %s", shutdownStorageErr)
 		}
 
 		server.GracefulStop()

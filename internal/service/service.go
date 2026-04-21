@@ -13,13 +13,13 @@ import (
 )
 
 type Storage interface {
-	CreateUser(user model.User) (int64, error)
-	GetUserByLogin(login string) *model.User
+	CreateUser(ctx context.Context, user model.User) (int64, error)
+	GetUserByLogin(ctx context.Context, login string) *model.User
 
-	CreateSecret(secret *model.CreateSecretDTO) (int64, error)
-	GetSecret(title string, userID int64) (*model.Secret, error)
-	GetSecrets(userID int64) ([]*model.Secret, error)
-	DeleteSecret(title string, userID int64) error
+	CreateSecret(ctx context.Context, secret *model.CreateSecretDTO) (int64, error)
+	GetSecret(ctx context.Context, title string, userID int64) (*model.Secret, error)
+	GetSecrets(ctx context.Context, userID int64) ([]*model.Secret, error)
+	DeleteSecret(ctx context.Context, title string, userID int64) error
 }
 
 type Service struct {
@@ -43,11 +43,7 @@ func New(lg *zap.SugaredLogger, storage Storage, userPasswordCost int, secretPas
 	}
 }
 
-func (s *Service) Shutdown(ctx context.Context) error {
-	return nil
-}
-
-func (s *Service) Register(_ context.Context, input *model.RegisterDTO) (string, error) {
+func (s *Service) Register(ctx context.Context, input *model.RegisterDTO) (string, error) {
 	if err := validateRegisterDTO(input); err != nil {
 		return "", err
 	}
@@ -57,7 +53,7 @@ func (s *Service) Register(_ context.Context, input *model.RegisterDTO) (string,
 		return "", model.ErrServerInternal
 	}
 
-	userID, err := s.storage.CreateUser(model.User{
+	userID, err := s.storage.CreateUser(ctx, model.User{
 		Login:        input.Login,
 		PasswordHash: passwordHash,
 	})
@@ -79,12 +75,12 @@ func (s *Service) Register(_ context.Context, input *model.RegisterDTO) (string,
 	return token, nil
 }
 
-func (s *Service) Login(_ context.Context, input *model.LoginDTO) (string, error) {
+func (s *Service) Login(ctx context.Context, input *model.LoginDTO) (string, error) {
 	if err := validateLoginDTO(input); err != nil {
 		return "", err
 	}
 
-	user := s.storage.GetUserByLogin(input.Login)
+	user := s.storage.GetUserByLogin(ctx, input.Login)
 	if user == nil {
 		return "", model.ErrInvalidLoginOrPassword
 	}
@@ -117,7 +113,7 @@ func (s *Service) CreateSecret(ctx context.Context, input *model.CreateSecretDTO
 		input.Password = passwordHash
 	}
 
-	if _, err := s.storage.CreateSecret(input); err != nil {
+	if _, err := s.storage.CreateSecret(ctx, input); err != nil {
 		return err
 	}
 
@@ -129,7 +125,7 @@ func (s *Service) GetSecret(ctx context.Context, title string, userID int64) (*m
 		return nil, model.ErrTitleIsRequired
 	}
 
-	secret, err := s.storage.GetSecret(title, userID)
+	secret, err := s.storage.GetSecret(ctx, title, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -146,7 +142,7 @@ func (s *Service) GetSecret(ctx context.Context, title string, userID int64) (*m
 }
 
 func (s *Service) GetSecrets(ctx context.Context, userID int64) ([]*model.Secret, error) {
-	secrets, err := s.storage.GetSecrets(userID)
+	secrets, err := s.storage.GetSecrets(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -169,5 +165,5 @@ func (s *Service) DeleteSecret(ctx context.Context, title string, userID int64) 
 		return model.ErrTitleIsRequired
 	}
 
-	return s.storage.DeleteSecret(title, userID)
+	return s.storage.DeleteSecret(ctx, title, userID)
 }

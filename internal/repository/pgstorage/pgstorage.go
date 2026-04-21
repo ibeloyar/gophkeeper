@@ -59,3 +59,7 @@ func New(connStr string) (*PGStorage, error) {
 		db: db,
 	}, nil
 }
+
+func (s *PGStorage) Shutdown() error {
+	return s.db.Close()
+}

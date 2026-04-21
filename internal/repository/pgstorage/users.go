@@ -1,16 +1,17 @@
 package pgstorage
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 
 	"github.com/ibeloyar/gophkeeper/internal/model"
 )
 
-func (s *PGStorage) CreateUser(user model.User) (int64, error) {
+func (s *PGStorage) CreateUser(ctx context.Context, user model.User) (int64, error) {
 	var userID int64
 
-	err := s.db.QueryRow(`INSERT INTO users (login, password_hash) VALUES ($1, $2) RETURNING id`,
+	err := s.db.QueryRowContext(ctx, `INSERT INTO users (login, password_hash) VALUES ($1, $2) RETURNING id`,
 		user.Login, user.PasswordHash,
 	).Scan(&userID)
 
@@ -21,10 +22,10 @@ func (s *PGStorage) CreateUser(user model.User) (int64, error) {
 	return userID, nil
 }
 
-func (s *PGStorage) GetUserByLogin(login string) *model.User {
+func (s *PGStorage) GetUserByLogin(ctx context.Context, login string) *model.User {
 	var user model.User
 
-	row := s.db.QueryRow("SELECT * FROM users WHERE login = $1", login)
+	row := s.db.QueryRowContext(ctx, "SELECT * FROM users WHERE login = $1", login)
 
 	err := row.Scan(&user.ID, &user.Login, &user.PasswordHash, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
