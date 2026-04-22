@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -12,7 +13,9 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/ibeloyar/gophkeeper/internal/model"
 	"github.com/ibeloyar/gophkeeper/internal/service"
+	"github.com/ibeloyar/gophkeeper/pgk/auth"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zaptest/observer"
 
@@ -303,4 +306,191 @@ func TestController_Login_EmptyFields(t *testing.T) {
 	router.ServeHTTP(rr2, req2)
 
 	assert.Equal(t, http.StatusBadRequest, rr2.Code)
+}
+
+func TestGetSecret_Success(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockStorage := mockPG.NewMockStorage(ctrl)
+	mockStorage.EXPECT().
+		GetSecret(context.Background(), "test-title", int64(1)).
+		Return(&model.Secret{
+			ID:         1,
+			UserID:     1,
+			Title:      "test-title",
+			SecretType: model.SecretTypeText,
+			TextData:   "test-text",
+		}, nil)
+
+	svc := service.New(
+		zap.NewNop().Sugar(),
+		mockStorage,
+		testUserPasswordCost,
+		testSecretPasswordKey,
+		testTokenExp,
+		testTokenSecret,
+	)
+	controller := New(zap.NewNop().Sugar(), svc)
+
+	handler := http.HandlerFunc(controller.GetSecret)
+
+	authMW := auth.AuthBearerMiddlewareInit[model.TokenInfo](testTokenSecret)
+	authHandler := authMW(handler)
+
+	body := model.GetSecretBody{Title: "test-title"}
+	bodyBytes, _ := json.Marshal(body)
+
+	tokenInfo := model.TokenInfo{
+		ID:    1,
+		Login: "admin",
+	}
+	token, _ := auth.GenerateBearerToken[model.TokenInfo](
+		tokenInfo,
+		testTokenExp,
+		testTokenSecret,
+	)
+
+	req := httptest.NewRequest("POST", "/api/v1/get-secret", bytes.NewReader(bodyBytes))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", token)
+
+	w := httptest.NewRecorder()
+	authHandler.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Contains(t, w.Header().Get("Content-Type"), "application/json")
+
+	var resp model.Secret
+	err := json.Unmarshal(w.Body.Bytes(), &resp)
+	require.NoError(t, err)
+	assert.Equal(t, "test-title", resp.Title)
+	assert.Equal(t, int64(1), resp.UserID)
+	assert.Equal(t, "test-text", resp.TextData)
+}
+func TestGetSecret_InvalidBody(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockStorage := mockPG.NewMockStorage(ctrl)
+	svc := service.New(
+		zap.NewNop().Sugar(),
+		mockStorage,
+		testUserPasswordCost,
+		testSecretPasswordKey,
+		testTokenExp,
+		testTokenSecret,
+	)
+	controller := New(zap.NewNop().Sugar(), svc)
+
+	handler := http.HandlerFunc(controller.GetSecret)
+	authMW := auth.AuthBearerMiddlewareInit[model.TokenInfo](testTokenSecret)
+	authHandler := authMW(handler)
+
+	req := httptest.NewRequest("POST", "/api/v1/get-secret", bytes.NewReader([]byte(`{???}`)))
+	req.Header.Set("Content-Type", "application/json")
+
+	tokenInfo := model.TokenInfo{
+		ID:    1,
+		Login: "admin",
+	}
+	token, _ := auth.GenerateBearerToken[model.TokenInfo](tokenInfo, testTokenExp, testTokenSecret)
+	req.Header.Set("Authorization", token)
+
+	w := httptest.NewRecorder()
+	authHandler.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusInternalServerError, w.Code)
+}
+
+func TestGetSecret_NotFound(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockStorage := mockPG.NewMockStorage(ctrl)
+	mockStorage.EXPECT().
+		GetSecret(context.Background(), "not-found", int64(1)).
+		Return(nil, model.ErrSecretNotFound)
+
+	svc := service.New(
+		zap.NewNop().Sugar(),
+		mockStorage,
+		testUserPasswordCost,
+		testSecretPasswordKey,
+		testTokenExp,
+		testTokenSecret,
+	)
+	controller := New(zap.NewNop().Sugar(), svc)
+
+	handler := http.HandlerFunc(controller.GetSecret)
+	authMW := auth.AuthBearerMiddlewareInit[model.TokenInfo](testTokenSecret)
+	authHandler := authMW(handler)
+
+	body := model.GetSecretBody{Title: "not-found"}
+	bodyBytes, _ := json.Marshal(body)
+
+	tokenInfo := model.TokenInfo{
+		ID:    1,
+		Login: "admin",
+	}
+	token, _ := auth.GenerateBearerToken[model.TokenInfo](
+		tokenInfo,
+		testTokenExp,
+		testTokenSecret,
+	)
+
+	req := httptest.NewRequest("POST", "/api/v1/get-secret", bytes.NewReader(bodyBytes))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", token)
+
+	w := httptest.NewRecorder()
+	authHandler.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusNotFound, w.Code)
+}
+
+func TestGetSecret_ServiceError(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockStorage := mockPG.NewMockStorage(ctrl)
+	mockStorage.EXPECT().
+		GetSecret(context.Background(), "test-title", int64(1)).
+		Return(nil, errors.New("internal storage error"))
+
+	svc := service.New(
+		zap.NewNop().Sugar(),
+		mockStorage,
+		testUserPasswordCost,
+		testSecretPasswordKey,
+		testTokenExp,
+		testTokenSecret,
+	)
+	controller := New(zap.NewNop().Sugar(), svc)
+
+	handler := http.HandlerFunc(controller.GetSecret)
+	authMW := auth.AuthBearerMiddlewareInit[model.TokenInfo](testTokenSecret)
+	authHandler := authMW(handler)
+
+	body := model.GetSecretBody{Title: "test-title"}
+	bodyBytes, _ := json.Marshal(body)
+
+	tokenInfo := model.TokenInfo{
+		ID:    1,
+		Login: "admin",
+	}
+	token, _ := auth.GenerateBearerToken[model.TokenInfo](
+		tokenInfo,
+		testTokenExp,
+		testTokenSecret,
+	)
+
+	req := httptest.NewRequest("POST", "/api/v1/get-secret", bytes.NewReader(bodyBytes))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", token)
+
+	w := httptest.NewRecorder()
+	authHandler.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusInternalServerError, w.Code)
 }
