@@ -16,5 +16,3 @@ security:
 swagger:
   enabled: true
   json_path: "./api/apidocs.swagger.json"
-
-

@@ -187,7 +187,7 @@ LOGO := "🦫"
 help:
 	@echo "$(LOGO)  $(CYAN)$(BOLD)$(APP_NAME)$(NO_COLOR)"
 	@echo ""
-	@echo "command           | description"
+	@echo "command                | description"
 	@echo "===================================================="
 	@echo "install-pg-tools       | install golang-migrate CLI"
 	@echo "install-mock-tools     | install mockgen/gomock"

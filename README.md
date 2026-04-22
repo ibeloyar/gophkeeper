@@ -1,5 +1,39 @@
 # Менеджер паролей GophKeeper
 
+## Server
+Запуск сервера
+```terminaloutput
+gophkeeper -c config/server/config.yaml
+```
+Пример config.yaml
+```yaml
+grpc_server:
+  addr: ":50022"
+
+http_server:
+  addr: ":8080"
+
+database:
+  dsn: "postgres://user:password@192.168.0.1051:5432/dbname?sslmode=disable"
+
+security:
+  user_password_cost: 3
+  token_secret: "secret"
+  token_lifetime: 1h
+  secret_password_key: "12345678901234567890123456789012" # 32 bytes AES‑256
+
+swagger:
+  enabled: true
+  json_path: "./api/apidocs.swagger.json"
+```
+
+> [!IMPORTANT]
+> При передаче в конфигурационном файле http_server.addr будет запущен http-сервер.
+> А так же при передаче swagger.enabled -> true, по адресу /swagger будет доступен
+> Swagger UI с интерактивной документацией API
+
+![swagger.png](docs/swagger.png)
+
 ## CLI
 Собраные под разные платформы CLI-приложения, находятся в ./cmd/client
 - gophkeeper-cli-darwin (MacOS)
@@ -21,6 +55,20 @@ grpc_server:
   addr: ":50022"
 ```
 
+После запуска вы должны зарегестрироваться 
+
+![register.png](docs/register.png)
+
+или войти в учётную запись
+
+![login.png](docs/login.png)
+
+и далее взаимодействовать с приложением с помощью подсказок
+
+![list.png](docs/list.png)
+
+![card.png](docs/card.png)
+
 ## Общие требования
 GophKeeper представляет собой клиент-серверную систему, позволяющую пользователю надёжно и безопасно хранить логины,
 пароли, бинарные данные и прочую приватную информацию.
@@ -35,14 +83,40 @@ GophKeeper представляет собой клиент-серверную �
 ### Клиент должен реализовывать следующую бизнес-логику:
 - [x] аутентификация и авторизация пользователей на удалённом сервере;
 - [x] доступ к приватным данным по запросу.
-- 
+
 ### Дополнительные требования:
 - [x] клиент должен распространяться в виде CLI-приложения с возможностью запуска на платформах Windows, Linux и Mac OS;
 - [x] клиент должен давать пользователю возможность получить информацию о версии и дате сборки бинарного файла клиента.
 
-## Тестирование и документация
+### Тестирование и документация
 - [x] Код всей системы должен быть покрыт юнит-тестами не менее чем на 70%.
 - [x] Каждая экспортированная функция, тип, переменная, а также пакет системы должны содержать исчерпывающую документацию.
+
+
+## Разработка и сборка
+Все необходимые команды для разработки и сборке указаны в make файле.
+```terminaloutput
+> make help
+
+🦫  gophkeeper
+
+command                | description
+====================================================
+install-pg-tools       | install golang-migrate CLI
+install-mock-tools     | install mockgen/gomock
+install-proto-tools    | download protoc + plugins
+install-all-tools      | install proto/mock/pg tools
+proto                  | generate proto files
+migrate-up             | apply DB migrations
+migrate-down           | rollback migration
+migrate-create         | create migration (NAME=...) 
+mock                   | generate Storage/Service mocks
+test                   | run tests
+test_cover             | tests + coverage report
+gofmt                  | format all Go files
+build-cli              | cross-platform CLI builds
+build                  | build server
+```
 
 ### Последнее тестовое покрытие
 ```
