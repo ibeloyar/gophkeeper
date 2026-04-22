@@ -41,10 +41,10 @@ func buildHTTPServer(lg *zap.SugaredLogger, appService *service.Service, cfg *co
 
 	protected := http.NewServeMux()
 
-	// protected.HandleFunc("/api/v1/secrets-create", controller.CreateSecret)
-	// protected.HandleFunc("/api/v1/secrets", controller.GetSecrets)
 	protected.HandleFunc("POST /api/v1/get-secret", controller.GetSecret)
-	// protected.HandleFunc("/api/v1/secret", controller.DeleteSecret)
+	protected.HandleFunc("POST /api/v1/get-secrets", controller.GetSecrets)
+	protected.HandleFunc("POST /api/v1/secrets-create", controller.CreateSecret)
+	protected.HandleFunc("POST /api/v1/delete-secret", controller.DeleteSecret)
 
 	// Middleware: auth + protected mux
 	authHandler := auth.AuthBearerMiddlewareInit[model.TokenInfo](cfg.Security.TokenSecret)(protected)

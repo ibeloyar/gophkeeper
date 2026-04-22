@@ -55,7 +55,6 @@ func writeJSON(w http.ResponseWriter, lg *zap.SugaredLogger, data interface{}, s
 
 	response, err := json.Marshal(data)
 	if err != nil {
-		fmt.Printf("DATA: %+v - %d\n", response, statusCode)
 		lg.Errorf("failed to parse request body: %v", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return

@@ -109,6 +109,21 @@ func (c *Controller) CreateSecret(
 	}
 
 	if err = c.service.CreateSecret(ctx, dto); err != nil {
+		if errors.Is(err, model.ErrTitleIsRequired) ||
+			errors.Is(err, model.ErrSecretLoginRequired) ||
+			errors.Is(err, model.ErrSecretLoginMaxLen) ||
+			errors.Is(err, model.ErrSecretPasswordRequired) ||
+			errors.Is(err, model.ErrSecretPasswordMaxLen) ||
+			errors.Is(err, model.ErrSecretTextDataRequired) ||
+			errors.Is(err, model.ErrSecretBinaryRequired) ||
+			errors.Is(err, model.ErrSecretCardNumberRequired) ||
+			errors.Is(err, model.ErrSecretCardNumberMaxLen) ||
+			errors.Is(err, model.ErrSecretCardExpRequired) ||
+			errors.Is(err, model.ErrSecretCardExpInvalid) ||
+			errors.Is(err, model.ErrSecretCardHolderRequired) ||
+			errors.Is(err, model.ErrSecretCardHolderMaxLen) {
+			return nil, status.Error(codes.InvalidArgument, err.Error())
+		}
 		return nil, err
 	}
 

@@ -18,3 +18,7 @@ type RegisterDTO struct {
 type GetSecretBody struct {
 	Title string `json:"title"`
 }
+
+type DeleteSecretBody struct {
+	Title string `json:"title"`
+}
