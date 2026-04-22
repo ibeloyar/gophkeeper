@@ -12,6 +12,7 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/ibeloyar/gophkeeper/internal/model"
+	"github.com/ibeloyar/gophkeeper/internal/repository/pgstorage"
 	"github.com/ibeloyar/gophkeeper/internal/service"
 	"github.com/ibeloyar/gophkeeper/pgk/auth"
 	"github.com/stretchr/testify/assert"
@@ -58,6 +59,30 @@ func TestController_Register_Success(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, rr.Code)
 	assert.NotEmpty(t, rr.Header().Get("Authorization"))
+}
+
+func TestController_Register_UserAlreadyExists(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockStorage := mockPG.NewMockStorage(ctrl)
+	svc := service.New(zap.NewNop().Sugar(), mockStorage, testUserPasswordCost, testSecretPasswordKey, testTokenExp, testTokenSecret)
+
+	mockStorage.EXPECT().CreateUser(context.Background(), gomock.Any()).Return(int64(0), errors.New(pgstorage.ErrIsExistCode)).Times(1)
+
+	c := New(zap.NewNop().Sugar(), svc)
+
+	router := http.NewServeMux()
+	router.HandleFunc("/api/v1/register", c.Register)
+
+	body, _ := json.Marshal(model.RegisterDTO{Login: "test", Password: "test"})
+	req := httptest.NewRequest("POST", "/api/v1/register", bytes.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+
+	rr := httptest.NewRecorder()
+	router.ServeHTTP(rr, req)
+
+	assert.Equal(t, http.StatusConflict, rr.Code)
 }
 
 func TestController_Register_EmptyFields(t *testing.T) {
@@ -368,6 +393,7 @@ func TestGetSecret_Success(t *testing.T) {
 	assert.Equal(t, int64(1), resp.UserID)
 	assert.Equal(t, "test-text", resp.TextData)
 }
+
 func TestGetSecret_InvalidBody(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()

@@ -17,7 +17,7 @@ import (
 
 type tokenDataContextKeyType string
 
-const tokenDataContextKey = tokenDataContextKeyType("token")
+const TokenDataContextKey = tokenDataContextKeyType("token")
 
 type Claims[T any] struct {
 	jwt.RegisteredClaims
@@ -78,7 +78,7 @@ func AuthBearerMiddlewareInit[T any](secret string) func(http.Handler) http.Hand
 				return
 			}
 
-			ctx := context.WithValue(r.Context(), tokenDataContextKey, tokenInfo)
+			ctx := context.WithValue(r.Context(), TokenDataContextKey, tokenInfo)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
@@ -87,7 +87,7 @@ func AuthBearerMiddlewareInit[T any](secret string) func(http.Handler) http.Hand
 func GetTokenInfo[T any](r *http.Request) *T {
 	ctx := r.Context()
 
-	tokenInfo, ok := ctx.Value(tokenDataContextKey).(*T)
+	tokenInfo, ok := ctx.Value(TokenDataContextKey).(*T)
 	if !ok {
 		return nil
 	}
@@ -96,7 +96,8 @@ func GetTokenInfo[T any](r *http.Request) *T {
 }
 
 func GetTokenInfoFromContext[T any](ctx context.Context) *T {
-	tokenInfo, ok := ctx.Value(tokenDataContextKey).(*T)
+	tokenInfo, ok := ctx.Value(TokenDataContextKey).(*T)
+
 	if !ok {
 		return nil
 	}
@@ -129,7 +130,7 @@ func AuthGRPCUnaryInterceptor[T any](secret string) grpc.UnaryServerInterceptor 
 			return nil, status.Error(codes.Unauthenticated, err.Error())
 		}
 
-		ctx = context.WithValue(ctx, tokenDataContextKey, tokenInfo)
+		ctx = context.WithValue(ctx, TokenDataContextKey, tokenInfo)
 		return handler(ctx, req)
 	}
 }

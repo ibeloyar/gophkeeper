@@ -144,7 +144,7 @@ func TestGetTokenInfoFromContext_NotFound(t *testing.T) {
 
 func TestGetTokenInfoFromContext_Valid(t *testing.T) {
 	tokenInfo := TokenInfo{ID: 123}
-	ctx := context.WithValue(context.Background(), tokenDataContextKey, &tokenInfo)
+	ctx := context.WithValue(context.Background(), TokenDataContextKey, &tokenInfo)
 
 	info := GetTokenInfoFromContext[TokenInfo](ctx)
 

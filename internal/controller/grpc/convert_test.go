@@ -1,18 +1,16 @@
 package grpc
 
 import (
+	"context"
 	"testing"
 	"time"
 
 	"github.com/ibeloyar/gophkeeper/internal/model"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	gophkeeperv1 "github.com/ibeloyar/gophkeeper/proto/gophkeeper/v1"
 )
-
-type TokenInfo struct {
-	ID int64
-}
 
 func TestConvertSecretTypeToProto(t *testing.T) {
 	tests := []struct {
@@ -293,4 +291,35 @@ func TestConvertGetSecretsToProto(t *testing.T) {
 	assert.Equal(t, []byte{1, 2, 3}, got[1].BinaryData)
 	assert.Equal(t, now.Add(2*time.Second).Format(time.RFC3339), got[1].CreatedAt)
 	assert.Equal(t, now.Add(3*time.Second).Format(time.RFC3339), got[1].UpdatedAt)
+}
+
+func TestConvertCreateSecretToDTO_TokenPresent(t *testing.T) {
+	input := &gophkeeperv1.CreateSecretRequest{
+		Title:      "test-title",
+		SecretType: gophkeeperv1.SecretType_TEXT,
+		Metadata:   "meta",
+		Login:      "test-login",
+		Password:   "test-pass",
+		TextData:   "test-text",
+		BinaryData: []byte("test-binary"),
+		CardExp:    "12/25",
+		CardNumber: "1234567812345678",
+		CardHolder: "Test Holder",
+	}
+
+	dto, err := convertCreateSecretToDTO(context.Background(), input)
+	require.NoError(t, err)
+	require.NotNil(t, dto)
+
+	assert.Equal(t, "test-title", dto.Title)
+	assert.Equal(t, model.SecretType("text"), dto.SecretType)
+
+	assert.Equal(t, "meta", dto.Metadata)
+	assert.Equal(t, "test-login", dto.Login)
+	assert.Equal(t, "test-pass", dto.Password)
+	assert.Equal(t, "test-text", dto.TextData)
+	assert.Equal(t, []byte("test-binary"), dto.BinaryData)
+	assert.Equal(t, "12/25", dto.CardExp)
+	assert.Equal(t, "1234567812345678", dto.CardNumber)
+	assert.Equal(t, "Test Holder", dto.CardHolder)
 }

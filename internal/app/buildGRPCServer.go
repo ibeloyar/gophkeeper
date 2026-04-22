@@ -1,16 +1,17 @@
 package app
 
 import (
-	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
-	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
-	grpcController "github.com/ibeloyar/gophkeeper/internal/controller/grpc"
 	"github.com/ibeloyar/gophkeeper/internal/model"
 	"github.com/ibeloyar/gophkeeper/internal/service"
 	"github.com/ibeloyar/gophkeeper/pgk/auth"
-	gophkeeperv1 "github.com/ibeloyar/gophkeeper/proto/gophkeeper/v1"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+
+	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
+	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
+	grpcController "github.com/ibeloyar/gophkeeper/internal/controller/grpc"
+	gophkeeperv1 "github.com/ibeloyar/gophkeeper/proto/gophkeeper/v1"
 )
 
 func buildGRPCServer(lg *zap.SugaredLogger, appService *service.Service, tokenSecret string) (*grpc.Server, error) {

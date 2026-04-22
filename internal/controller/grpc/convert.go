@@ -41,10 +41,15 @@ func convertSecretTypeToDTO(secretType gophkeeperv1.SecretType) model.SecretType
 }
 
 func convertCreateSecretToDTO(ctx context.Context, input *gophkeeperv1.CreateSecretRequest) (*model.CreateSecretDTO, error) {
+	userID := int64(0)
+
 	tokenInfo := auth.GetTokenInfoFromContext[model.TokenInfo](ctx)
+	if tokenInfo != nil {
+		userID = tokenInfo.ID
+	}
 
 	return &model.CreateSecretDTO{
-		UserID:     tokenInfo.ID,
+		UserID:     userID,
 		Title:      input.Title,
 		SecretType: convertSecretTypeToDTO(input.SecretType),
 
