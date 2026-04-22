@@ -104,8 +104,8 @@ BUILD_VERSION ?= v1.0.0
 BUILD_DATE ?= 2026-03-04
 GRPC_SERVER_ADDR ?= :8080
 LDFLAGS = -X main.buildVersion=$(BUILD_VERSION) -X main.buildDate=$(BUILD_DATE)
-.PHONY: build
-build:
+.PHONY: build-cli
+build-cli:
 	@echo "Building Linux..."
 	GOOS=linux GOARCH=amd64 go build -ldflags="$(LDFLAGS)" -o ./cmd/client/$(BINARY_NAME)-linux   ./internal/client
 
@@ -114,6 +114,10 @@ build:
 
 	@echo "Building Windows..."
 	GOOS=windows GOARCH=amd64 go build -ldflags="$(LDFLAGS)" -o ./cmd/client/$(BINARY_NAME)-win.exe ./internal/client
+
+.PHONY: build
+build:
+	go build -o ./cmd/server/gophkeeper ./cmd/server
 
 .PHONY: migrate-up
 migrate-up:
@@ -185,6 +189,17 @@ help:
 	@echo ""
 	@echo "command           | description"
 	@echo "===================================================="
-	@echo "proto             | generate proto files"
-	@echo "test              | run tests"
-	@echo "test_cover        | run tests with coverage"
+	@echo "install-pg-tools       | install golang-migrate CLI"
+	@echo "install-mock-tools     | install mockgen/gomock"
+	@echo "install-proto-tools    | download protoc + plugins"
+	@echo "install-all-tools      | install proto/mock/pg tools"
+	@echo "proto                  | generate proto files"
+	@echo "migrate-up             | apply DB migrations"
+	@echo "migrate-down           | rollback migration"
+	@echo "migrate-create         | create migration (NAME=...) "
+	@echo "mock                   | generate Storage/Service mocks"
+	@echo "test                   | run tests"
+	@echo "test_cover             | tests + coverage report"
+	@echo "gofmt                  | format all Go files"
+	@echo "build-cli              | cross-platform CLI builds"
+	@echo "build                  | build server"

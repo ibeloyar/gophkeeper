@@ -2,6 +2,7 @@
 
 bin
 build
+cmd/server/gophkeeper
 
 coverage.out
 coverage.filtered.out

@@ -38,8 +38,11 @@ func TestBuildHTTPServer_Success(t *testing.T) {
 		testTokenSecret,
 	)
 
-	cfg, _ := config.Read("../../config/server/config.yaml")
-
-	_, err := buildHTTPServer(lg, svc, cfg)
+	_, err := buildHTTPServer(lg, svc, &config.Config{
+		HttpServer: config.HTTPServer{
+			Addr: ":8080",
+		},
+	})
+	
 	require.NoError(t, err)
 }
