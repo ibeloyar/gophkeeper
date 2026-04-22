@@ -9,6 +9,9 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
+// updateSecretDelete handles confirmation dialog for secret deletion.
+// Waits for 'y' (delete via gRPC) or 'n' (cancel). Supports quit with Ctrl+C.
+// Sets error on gRPC failure and returns to secrets list after operation.
 func (a app) updateSecretDelete(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -41,6 +44,9 @@ func (a app) updateSecretDelete(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return a, nil
 }
 
+// secretDeleteView renders confirmation dialog for secret deletion.
+// Displays secret title and clear YES/NO options with keyboard shortcuts.
+// Simple two-choice interface prevents accidental deletions.
 func (a app) secretDeleteView() string {
 	s := fmt.Sprintf("Gophkeeper-cli %s (%s) Server: %s \n==================================================\n",
 		a.buildVersion, a.buildDate, a.serverAddr,

@@ -21,10 +21,16 @@ const (
 	migrationsPath  = "./migrations"
 )
 
+// PGStorage wraps sql.DB with PostgreSQL connection pool and migration management.
 type PGStorage struct {
 	db *sql.DB
 }
 
+// New creates PostgreSQL storage with automatic schema migrations.
+// 1. Establishes pgx connection pool
+// 2. Initializes migration driver with schema_migrations table
+// 3. Applies all pending migrations from ./migrations directory
+// 4. Returns sql.DB compatible storage instance
 func New(connStr string) (*PGStorage, error) {
 	pool, err := pgxpool.New(context.Background(), connStr)
 	if err != nil {
@@ -60,6 +66,8 @@ func New(connStr string) (*PGStorage, error) {
 	}, nil
 }
 
+// Shutdown closes database connection pool gracefully.
+// Call during application shutdown to release resources.
 func (s *PGStorage) Shutdown() error {
 	return s.db.Close()
 }

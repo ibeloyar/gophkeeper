@@ -17,13 +17,19 @@ import (
 
 type tokenDataContextKeyType string
 
+// TokenDataContextKey is the context key for accessing verified token claims.
 const TokenDataContextKey = tokenDataContextKeyType("token")
 
+// Claims extends jwt.RegisteredClaims with custom token payload.
+// T is the application-specific token data type (user ID, roles, etc.).
 type Claims[T any] struct {
 	jwt.RegisteredClaims
 	TokenInfo T
 }
 
+// GenerateBearerToken creates a signed JWT Bearer token with custom claims.
+// Uses HS256 (HMAC-SHA256) signing. Sets expiration and issued-at timestamps.
+// Returns "Bearer <token>" format for HTTP Authorization headers.
 func GenerateBearerToken[T any](input T, exp time.Duration, secret string) (token string, err error) {
 	tokenData := jwt.NewWithClaims(jwt.SigningMethodHS256, &Claims[T]{
 		TokenInfo: input,
@@ -41,6 +47,9 @@ func GenerateBearerToken[T any](input T, exp time.Duration, secret string) (toke
 	return fmt.Sprintf("Bearer %s", token), nil
 }
 
+// VerifyJWTBearerToken parses and validates JWT Bearer token.
+// Extracts token from "Bearer <token>" format, verifies signature and claims.
+// Returns pointer to custom TokenInfo or error.
 func VerifyJWTBearerToken[T any](tokenString, secret string) (*T, error) {
 	claims := &Claims[T]{}
 
@@ -69,6 +78,8 @@ func VerifyJWTBearerToken[T any](tokenString, secret string) (*T, error) {
 	return &claims.TokenInfo, nil
 }
 
+// AuthBearerMiddlewareInit returns HTTP middleware that validates JWT Bearer tokens.
+// Rejects unauthorized requests with 401. Stores verified claims in request context.
 func AuthBearerMiddlewareInit[T any](secret string) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -84,6 +95,8 @@ func AuthBearerMiddlewareInit[T any](secret string) func(http.Handler) http.Hand
 	}
 }
 
+// GetTokenInfo extracts verified token claims from HTTP request context.
+// Returns nil if no valid token found in context.
 func GetTokenInfo[T any](r *http.Request) *T {
 	ctx := r.Context()
 
@@ -95,6 +108,8 @@ func GetTokenInfo[T any](r *http.Request) *T {
 	return tokenInfo
 }
 
+// GetTokenInfoFromContext extracts verified token claims from any context.
+// Returns nil if no valid token found in context. Safe for gRPC and HTTP use.
 func GetTokenInfoFromContext[T any](ctx context.Context) *T {
 	tokenInfo, ok := ctx.Value(TokenDataContextKey).(*T)
 
@@ -104,6 +119,9 @@ func GetTokenInfoFromContext[T any](ctx context.Context) *T {
 	return tokenInfo
 }
 
+// AuthGRPCUnaryInterceptor returns gRPC unary interceptor for JWT Bearer auth.
+// Skips auth for public methods (Register/Login). Validates Authorization metadata.
+// Stores verified claims in context for gRPC handler access.
 func AuthGRPCUnaryInterceptor[T any](secret string) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		withoutAuthMethods := []string{

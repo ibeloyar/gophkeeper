@@ -40,6 +40,9 @@ func convertSecretTypeToDTO(secretType gophkeeperv1.SecretType) model.SecretType
 	}
 }
 
+// convertCreateSecretToDTO transforms gRPC CreateSecretRequest to model.CreateSecretDTO.
+// Extracts userID from JWT context. Populates all secret fields based on SecretType.
+// Returns populated DTO with user context for service layer processing.
 func convertCreateSecretToDTO(ctx context.Context, input *gophkeeperv1.CreateSecretRequest) (*model.CreateSecretDTO, error) {
 	userID := int64(0)
 
@@ -68,6 +71,9 @@ func convertCreateSecretToDTO(ctx context.Context, input *gophkeeperv1.CreateSec
 	}, nil
 }
 
+// convertGetSecretToProto transforms model.Secret to gRPC GetSecretResponse.
+// Formats timestamps as RFC3339 strings. Converts SecretType enum.
+// Used in GetSecret RPC response.
 func convertGetSecretToProto(input *model.Secret) *gophkeeperv1.GetSecretResponse {
 	return &gophkeeperv1.GetSecretResponse{
 		Id:         input.ID,
@@ -92,6 +98,8 @@ func convertGetSecretToProto(input *model.Secret) *gophkeeperv1.GetSecretRespons
 	}
 }
 
+// convertGetSecretsToProto transforms []*model.Secret slice to []*gophkeeperv1.Secret slice.
+// Applies convertGetSecretToProto logic to each secret. Used in GetSecrets RPC
 func convertGetSecretsToProto(secrets []*model.Secret) []*gophkeeperv1.Secret {
 	result := make([]*gophkeeperv1.Secret, 0)
 

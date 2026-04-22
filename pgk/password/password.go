@@ -18,6 +18,9 @@ var (
 	ErrDecryptFailed    = errors.New("decrypt failed")
 )
 
+// HashPassword generates a BCrypt hash for the given password using specified cost factor.
+// Password length must be 1-64 characters. Cost range: 4-31 (default: 10).
+// Returns BCrypt hash string or error.
 func HashPassword(password string, passCost int) (string, error) {
 	if len(password) < 1 {
 		return "", ErrPasswordRequired
@@ -34,11 +37,16 @@ func HashPassword(password string, passCost int) (string, error) {
 	return string(bytes), err
 }
 
+// CheckPasswordHash verifies if plaintext password matches the BCrypt hash.
+// Returns true if passwords match, false otherwise.
 func CheckPasswordHash(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
 }
 
+// EncryptPassword encrypts password using AES-256-GCM authenticated encryption.
+// Requires exactly 32-byte key (AES-256). Generates random nonce.
+// Returns base64-encoded nonce+ciphertext for safe storage/transmission.
 func EncryptPassword(password string, keyStr string) (string, error) {
 	if len(password) < 1 {
 		return "", ErrDecryptFailed
@@ -73,6 +81,9 @@ func EncryptPassword(password string, keyStr string) (string, error) {
 	return base64.StdEncoding.EncodeToString(out), nil
 }
 
+// DecryptPassword decrypts base64-encoded AES-256-GCM ciphertext back to plaintext.
+// Extracts nonce from first gcm.NonceSize() bytes. Validates integrity.
+// Returns original password or error if decryption fails.
 func DecryptPassword(cipherTextB64, keyStr string) (string, error) {
 	key := []byte(keyStr)
 	if len(key) != 32 {

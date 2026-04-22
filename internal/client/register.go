@@ -12,12 +12,17 @@ import (
 	gophkeeperv1 "github.com/ibeloyar/gophkeeper/proto/gophkeeper/v1"
 )
 
+// registerForm manages state for user registration form in TUI.
+// Contains login and password inputs identical to login form.
 type registerForm struct {
 	loginInput    textinput.Model
 	passwordInput textinput.Model
 	err           error
 }
 
+// updateRegister processes keyboard events for registration form.
+// Performs gRPC Register RPC on Enter, extracts JWT token from response headers.
+// Supports Tab navigation between fields, Ctrl+B returns to login form.
 func (a app) updateRegister(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 
@@ -85,6 +90,8 @@ func (a app) updateRegister(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return a, cmd
 }
 
+// registerView renders registration form UI with input fields and validation.
+// Shows login prompt and navigation to login form. Displays build/server info.
 func (a app) registerView() string {
 	s := fmt.Sprintf("Gophkeeper-cli %s (%s) Server: %s \n==================================================\n",
 		a.buildVersion, a.buildDate, a.serverAddr,

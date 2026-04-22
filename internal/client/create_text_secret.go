@@ -12,6 +12,8 @@ import (
 	gophkeeperv1 "github.com/ibeloyar/gophkeeper/proto/gophkeeper/v1"
 )
 
+// createTextSecretModel manages UI state for text secret creation form.
+// Handles three text inputs (title*, metadata, textData*) with validation.
 type createTextSecretModel struct {
 	title      textinput.Model
 	metadata   textinput.Model
@@ -20,6 +22,10 @@ type createTextSecretModel struct {
 	err        error
 }
 
+// updateCreateTextSecret handles keyboard input for text secret creation.
+// Validates title and textData on Enter, sends gRPC CreateSecret with TEXT type.
+// Circular navigation between three fields using Tab/Shift+Tab/Up/Down.
+// Clears form and refreshes secrets list after successful creation.
 func (a app) updateCreateTextSecret(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 
@@ -106,6 +112,9 @@ func (a app) updateCreateTextSecret(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return a, cmd
 }
 
+// createTextSecretView renders TUI form for text secret creation.
+// Displays required fields (title*, text data*) with validation errors.
+// Includes build info, server address, and keyboard shortcuts.
 func (a app) createTextSecretView() string {
 	s := fmt.Sprintf("Gophkeeper-cli %s (%s) Server: %s \n==================================================\n",
 		a.buildVersion, a.buildDate, a.serverAddr,

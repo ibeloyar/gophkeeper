@@ -13,6 +13,8 @@ import (
 	gophkeeperv1 "github.com/ibeloyar/gophkeeper/proto/gophkeeper/v1"
 )
 
+// createBinarySecretModel represents UI state for binary secret creation form.
+// Manages three text inputs (title, metadata, file path) with focus and validation.
 type createBinarySecretModel struct {
 	title      textinput.Model
 	metadata   textinput.Model
@@ -21,6 +23,9 @@ type createBinarySecretModel struct {
 	err        error
 }
 
+// updateCreateBinarySecret handles keyboard input for binary secret creation form.
+// Supports navigation (Tab/Shift+Tab, Up/Down), validation, file reading, gRPC creation.
+// Returns updated app model and commands (poll secrets after successful creation).
 func (a app) updateCreateBinarySecret(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 
@@ -127,6 +132,9 @@ func (a app) updateCreateBinarySecret(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return a, cmd
 }
 
+// createBinarySecretView renders TUI form for binary secret creation.
+// Displays input fields with focus indicators, validation errors, and navigation help.
+// Shows build info, server address, and current state.
 func (a app) createBinarySecretView() string {
 	s := fmt.Sprintf("Gophkeeper-cli %s (%s) Server: %s \n==================================================\n",
 		a.buildVersion, a.buildDate, a.serverAddr,

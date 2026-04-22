@@ -12,6 +12,8 @@ import (
 	gophkeeperv1 "github.com/ibeloyar/gophkeeper/proto/gophkeeper/v1"
 )
 
+// createCardSecretModel manages UI state for credit card secret creation form.
+// Handles six text inputs with validation for required card fields.
 type createCardSecretModel struct {
 	title      textinput.Model
 	metadata   textinput.Model
@@ -22,6 +24,10 @@ type createCardSecretModel struct {
 	err        error
 }
 
+// updateCreateCardSecret processes keyboard events for card secret form.
+// Validates required fields, sends gRPC CreateSecret request with CARD type,
+// navigates between 6 input fields using Tab/Shift+Tab/Up/Down arrows.
+// Clears form and returns to secrets list on success.
 func (a app) updateCreateCardSecret(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 
@@ -137,6 +143,9 @@ func (a app) updateCreateCardSecret(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return a, cmd
 }
 
+// createCardSecretView renders TUI form for credit card secret creation.
+// Displays 5 input fields (title*, metadata, card number*, holder*, exp*).
+// Shows validation errors and navigation instructions.
 func (a app) createCardSecretView() string {
 	s := fmt.Sprintf("Gophkeeper-cli %s (%s) Server: %s \n==================================================\n",
 		a.buildVersion, a.buildDate, a.serverAddr,

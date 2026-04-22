@@ -7,6 +7,9 @@ import (
 	gophkeeperv1 "github.com/ibeloyar/gophkeeper/proto/gophkeeper/v1"
 )
 
+// updateSecretCard handles keyboard navigation for secret detail view.
+// Supports only navigation keys: Ctrl+B returns to secrets list, Ctrl+C quits.
+// No editing - read-only display of decrypted secret contents.
 func (a app) updateSecretCard(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -24,6 +27,9 @@ func (a app) updateSecretCard(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return a, nil
 }
 
+// secretCardView renders read-only detail view for any secret type.
+// Displays title and type-specific fields (login/password, text, binary size, card details).
+// Shows decrypted passwords for LOGIN_PASSWORD secrets. Includes navigation help.
 func (a app) secretCardView() string {
 	s := fmt.Sprintf("Gophkeeper-cli %s (%s) Server: %s \n==================================================\n",
 		a.buildVersion, a.buildDate, a.serverAddr,

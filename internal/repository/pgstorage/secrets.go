@@ -8,6 +8,9 @@ import (
 	"github.com/ibeloyar/gophkeeper/internal/model"
 )
 
+// GetSecret retrieves a single secret by title and userID from PostgreSQL secrets table.
+// Returns nil, nil if secret doesn't exist (sql.ErrNoRows). Scans all secret fields
+// into model.Secret struct. Uses context for cancellation/timeout support.
 func (s *PGStorage) GetSecret(ctx context.Context, title string, userID int64) (*model.Secret, error) {
 	var secret model.Secret
 
@@ -26,6 +29,9 @@ func (s *PGStorage) GetSecret(ctx context.Context, title string, userID int64) (
 	return &secret, nil
 }
 
+// GetSecrets retrieves all secrets for a specific userID. Returns them sorted by title.
+// Uses explicit column list for performance and stability. Properly handles rows.Close()
+// and rows.Err() for complete result set iteration.
 func (s *PGStorage) GetSecrets(ctx context.Context, userID int64) ([]*model.Secret, error) {
 	var secrets []*model.Secret
 
@@ -65,6 +71,9 @@ func (s *PGStorage) GetSecrets(ctx context.Context, userID int64) ([]*model.Secr
 	return secrets, nil
 }
 
+// CreateSecret inserts new secret record and returns generated ID.
+// Supports all secret types (login/password, text, binary, card). Uses RETURNING clause
+// for efficient ID retrieval. Stores password_hash field from CreateSecretDTO.Password.
 func (s *PGStorage) CreateSecret(ctx context.Context, secret *model.CreateSecretDTO) (int64, error) {
 	var id int64
 
@@ -84,6 +93,9 @@ func (s *PGStorage) CreateSecret(ctx context.Context, secret *model.CreateSecret
 	return id, nil
 }
 
+// DeleteSecret removes secret by title and userID. Returns model.ErrSecretNotFound
+// if no rows affected (secret doesn't exist or doesn't belong to user).
+// Uses ExecContext for non-query operations with proper context support.
 func (s *PGStorage) DeleteSecret(ctx context.Context, title string, userID int64) error {
 	q := `DELETE FROM secrets WHERE user_id = $1 AND title = $2;`
 

@@ -12,12 +12,17 @@ import (
 	gophkeeperv1 "github.com/ibeloyar/gophkeeper/proto/gophkeeper/v1"
 )
 
+// loginForm manages state for user login form in TUI.
+// Contains two text inputs (login*, password*) with error display.
 type loginForm struct {
 	loginInput    textinput.Model
 	passwordInput textinput.Model
 	err           error
 }
 
+// updateLogin handles keyboard events for login form.
+// Performs gRPC Login RPC on Enter (with both fields filled), extracts token from headers.
+// Supports Tab navigation between fields, Ctrl+R to switch to registration.
 func (a app) updateLogin(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 
@@ -86,6 +91,8 @@ func (a app) updateLogin(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return a, cmd
 }
 
+// loginView renders login form UI with input fields, validation errors, and navigation.
+// Displays build info, server address, and registration prompt.
 func (a app) loginView() string {
 	s := fmt.Sprintf("Gophkeeper-cli %s (%s) Server: %s \n==================================================\n",
 		a.buildVersion, a.buildDate, a.serverAddr,

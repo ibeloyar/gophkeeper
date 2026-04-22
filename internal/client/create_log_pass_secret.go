@@ -12,6 +12,8 @@ import (
 	gophkeeperv1 "github.com/ibeloyar/gophkeeper/proto/gophkeeper/v1"
 )
 
+// createLogPassSecretModel manages state for login/password secret creation form.
+// Handles four text inputs (title*, metadata, login*, password*) with validation.
 type createLogPassSecretModel struct {
 	title      textinput.Model
 	metadata   textinput.Model
@@ -21,6 +23,9 @@ type createLogPassSecretModel struct {
 	err        error
 }
 
+// updateCreateLogPassSecret processes input events for login/password secret form.
+// Validates required fields on Enter, sends gRPC CreateSecret with LOGIN_PASSWORD type.
+// Supports field navigation with Tab/Shift+Tab/Up/Down, returns to secrets list on success.
 func (a app) updateCreateLogPassSecret(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 
@@ -122,6 +127,9 @@ func (a app) updateCreateLogPassSecret(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return a, cmd
 }
 
+// createLogPassSecretView renders form for login/password secret creation.
+// Shows required fields (title*, login*, password*) with validation errors.
+// Displays navigation help and build/server information.
 func (a app) createLogPassSecretView() string {
 	s := fmt.Sprintf("Gophkeeper-cli %s (%s) Server: %s \n==================================================\n",
 		a.buildVersion, a.buildDate, a.serverAddr,

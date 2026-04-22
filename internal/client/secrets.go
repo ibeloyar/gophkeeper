@@ -11,16 +11,23 @@ import (
 	gophkeeperv1 "github.com/ibeloyar/gophkeeper/proto/gophkeeper/v1"
 )
 
+// secretsPage manages state for secrets list page in TUI.
+// Contains only error field for displaying gRPC operation failures.
 type secretsPage struct {
 	err error
 }
 
+// pollSecrets returns a ticker command that triggers loadSecretsMsg every 3 seconds.
+// Enables automatic refresh of secrets list without manual user action.
 func (a app) pollSecrets() tea.Cmd {
 	return tea.Tick(time.Second*3, func(t time.Time) tea.Msg {
 		return loadSecretsMsg{}
 	})
 }
 
+// updateSecrets handles keyboard navigation and auto-refresh for secrets list.
+// Supports creating new secrets (l,t,b,c), deleting (d), viewing (Enter), navigation (↑↓).
+// Auto-refreshes every 3 seconds via loadSecretsMsg. Manages cursor position.
 func (a app) updateSecrets(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -94,6 +101,9 @@ func (a app) updateSecrets(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return a, nil
 }
 
+// secretsView renders paginated secrets list with cursor navigation.
+// Shows loading state, empty state, errors, and comprehensive keyboard shortcuts.
+// Displays build info, server address, and secret titles with cursor indicator.
 func (a app) secretsView() string {
 	s := fmt.Sprintf("Gophkeeper-cli %s (%s) Server: %s \n==================================================\n",
 		a.buildVersion, a.buildDate, a.serverAddr,

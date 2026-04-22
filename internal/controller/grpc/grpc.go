@@ -25,6 +25,8 @@ type Service interface {
 	DeleteSecret(ctx context.Context, title string, userID int64) error
 }
 
+// Controller implements gophkeeperv1.GophkeeperServer with business logic delegation.
+// Embeds UnimplementedGophkeeperServer and handles panic recovery, error mapping.
 type Controller struct {
 	gophkeeperv1.UnimplementedGophkeeperServer
 
@@ -32,6 +34,7 @@ type Controller struct {
 	service Service
 }
 
+// New creates Controller instance with logger and service dependencies.
 func New(lg *zap.SugaredLogger, service Service) *Controller {
 	return &Controller{
 		logger:  lg,
@@ -39,6 +42,8 @@ func New(lg *zap.SugaredLogger, service Service) *Controller {
 	}
 }
 
+// HandlePanic recovers from panics, logs stack trace, and returns standard internal error.
+// Called by gRPC unary interceptor for global panic protection.
 func (c *Controller) HandlePanic(p any) error {
 	if p != nil {
 		c.logger.Errorf("%v\n%s", p, string(debug.Stack()))
@@ -46,6 +51,9 @@ func (c *Controller) HandlePanic(p any) error {
 	return model.ErrServerInternal
 }
 
+// Register handles gRPC RegisterRequest. Creates user account via service layer.
+// Maps business errors to gRPC codes: InvalidArgument, AlreadyExists, Internal.
+// Sends JWT token via gRPC headers for client retrieval.
 func (c *Controller) Register(
 	ctx context.Context,
 	req *gophkeeperv1.RegisterRequest,
@@ -74,6 +82,8 @@ func (c *Controller) Register(
 	return &gophkeeperv1.RegisterResponse{}, nil
 }
 
+// Login handles gRPC LoginRequest. Authenticates user via service layer.
+// Maps business errors to gRPC codes. Sends JWT token via headers.
 func (c *Controller) Login(
 	ctx context.Context,
 	req *gophkeeperv1.LoginRequest,
@@ -99,6 +109,8 @@ func (c *Controller) Login(
 	return &gophkeeperv1.LoginResponse{}, nil
 }
 
+// CreateSecret handles gRPC CreateSecretRequest. Converts proto to DTO and delegates to service.
+// Maps validation errors to gRPC InvalidArgument, others to Internal.
 func (c *Controller) CreateSecret(
 	ctx context.Context,
 	req *gophkeeperv1.CreateSecretRequest,
@@ -130,6 +142,8 @@ func (c *Controller) CreateSecret(
 	return &gophkeeperv1.CreateSecretResponse{}, nil
 }
 
+// GetSecret handles gRPC GetSecretRequest. Extracts userID from JWT context.
+// Returns NotFound if secret doesn't exist for user, delegates other errors.
 func (c *Controller) GetSecret(
 	ctx context.Context,
 	req *gophkeeperv1.GetSecretRequest,
@@ -147,6 +161,7 @@ func (c *Controller) GetSecret(
 	return convertGetSecretToProto(secret), nil
 }
 
+// GetSecrets handles gRPC GetSecretsRequest. Extracts userID from JWT and lists user's secrets.
 func (c *Controller) GetSecrets(
 	ctx context.Context,
 	req *gophkeeperv1.GetSecretsRequest,
@@ -163,6 +178,8 @@ func (c *Controller) GetSecrets(
 	}, nil
 }
 
+// DeleteSecret handles gRPC DeleteSecretRequest. Extracts userID from JWT context.
+// Maps secret not found to gRPC NotFound status.
 func (c *Controller) DeleteSecret(
 	ctx context.Context,
 	req *gophkeeperv1.DeleteSecretRequest,

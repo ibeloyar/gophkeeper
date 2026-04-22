@@ -32,6 +32,7 @@ type Service struct {
 	tokenExp          time.Duration
 }
 
+// New creates Service with all dependencies injected. Configures security parameters.
 func New(lg *zap.SugaredLogger, storage Storage, userPasswordCost int, secretPasswordKey string, tokenExp time.Duration, tokenSecret string) *Service {
 	return &Service{
 		lg:                lg,
@@ -43,6 +44,9 @@ func New(lg *zap.SugaredLogger, storage Storage, userPasswordCost int, secretPas
 	}
 }
 
+// Register validates input, hashes password with BCrypt, creates user, generates JWT.
+// Maps PostgreSQL unique constraint violation to ErrUserAlreadyExist.
+// Returns Bearer token for successful registration.
 func (s *Service) Register(ctx context.Context, input *model.RegisterDTO) (string, error) {
 	if err := validateRegisterDTO(input); err != nil {
 		return "", err
@@ -75,6 +79,8 @@ func (s *Service) Register(ctx context.Context, input *model.RegisterDTO) (strin
 	return token, nil
 }
 
+// Login validates input, retrieves user, verifies BCrypt password hash, generates JWT.
+// Returns ErrInvalidLoginOrPassword for wrong credentials or missing user.
 func (s *Service) Login(ctx context.Context, input *model.LoginDTO) (string, error) {
 	if err := validateLoginDTO(input); err != nil {
 		return "", err
@@ -100,6 +106,8 @@ func (s *Service) Login(ctx context.Context, input *model.LoginDTO) (string, err
 	return token, nil
 }
 
+// CreateSecret validates input, encrypts password for LoginPassword secrets using AES-256-GCM.
+// Delegates storage with encrypted data. Propagates validation/storage errors.
 func (s *Service) CreateSecret(ctx context.Context, input *model.CreateSecretDTO) error {
 	if err := validateCreateSecretDTO(input); err != nil {
 		return err
@@ -120,6 +128,8 @@ func (s *Service) CreateSecret(ctx context.Context, input *model.CreateSecretDTO
 	return nil
 }
 
+// GetSecret fetches secret from storage, decrypts password for LoginPassword type.
+// Returns ErrTitleIsRequired for empty title, ErrSecretNotFound if not owned by user.
 func (s *Service) GetSecret(ctx context.Context, title string, userID int64) (*model.Secret, error) {
 	if title == "" {
 		return nil, model.ErrTitleIsRequired
@@ -144,6 +154,8 @@ func (s *Service) GetSecret(ctx context.Context, title string, userID int64) (*m
 	return secret, nil
 }
 
+// GetSecrets lists all user secrets with password decryption for LoginPassword type.
+// Returns decrypted plaintext passwords in results.
 func (s *Service) GetSecrets(ctx context.Context, userID int64) ([]*model.Secret, error) {
 	secrets, err := s.storage.GetSecrets(ctx, userID)
 	if err != nil {
@@ -163,6 +175,8 @@ func (s *Service) GetSecrets(ctx context.Context, userID int64) ([]*model.Secret
 	return secrets, nil
 }
 
+// DeleteSecret validates title, delegates to storage layer.
+// Propagates ErrTitleIsRequired and storage errors (including ErrSecretNotFound).
 func (s *Service) DeleteSecret(ctx context.Context, title string, userID int64) error {
 	if title == "" {
 		return model.ErrTitleIsRequired

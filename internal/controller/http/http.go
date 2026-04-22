@@ -25,6 +25,7 @@ type Controller struct {
 	lg      *zap.SugaredLogger
 }
 
+// New creates Controller with logger and service dependencies injected.
 func New(lg *zap.SugaredLogger, s Service) *Controller {
 	return &Controller{
 		lg:      lg,
@@ -32,6 +33,8 @@ func New(lg *zap.SugaredLogger, s Service) *Controller {
 	}
 }
 
+// Register handles HTTP POST /register. Parses RegisterDTO from JSON body.
+// Maps business errors to HTTP 400/409/500. Returns Bearer token in Authorization header.
 func (c *Controller) Register(w http.ResponseWriter, r *http.Request) {
 	body, err := readBody[model.RegisterDTO](r)
 	if err != nil {
@@ -60,6 +63,8 @@ func (c *Controller) Register(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+// Login handles HTTP POST /login. Parses LoginDTO from JSON body.
+// Maps business errors to HTTP 400/500. Returns Bearer token in Authorization header.
 func (c *Controller) Login(w http.ResponseWriter, r *http.Request) {
 	body, err := readBody[model.LoginDTO](r)
 	if err != nil {
@@ -84,6 +89,8 @@ func (c *Controller) Login(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+// GetSecret handles HTTP GET/POST /secret. Requires JWT auth. Parses title from body.
+// Returns 404 for non-existent secrets. JSON response with secret details.
 func (c *Controller) GetSecret(w http.ResponseWriter, r *http.Request) {
 	tokenInfo := auth.GetTokenInfo[model.TokenInfo](r)
 
@@ -108,6 +115,7 @@ func (c *Controller) GetSecret(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, c.lg, secret, http.StatusOK)
 }
 
+// GetSecrets handles HTTP GET /secrets. Requires JWT auth. Returns JSON array of user's secrets.
 func (c *Controller) GetSecrets(w http.ResponseWriter, r *http.Request) {
 	tokenInfo := auth.GetTokenInfo[model.TokenInfo](r)
 
@@ -121,6 +129,8 @@ func (c *Controller) GetSecrets(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, c.lg, secrets, http.StatusOK)
 }
 
+// CreateSecret handles HTTP POST /secret. Requires JWT auth. Parses CreateSecretDTO from body.
+// Maps validation errors to HTTP 400. Sets UserID from JWT token.
 func (c *Controller) CreateSecret(w http.ResponseWriter, r *http.Request) {
 	body, err := readBody[model.CreateSecretDTO](r)
 	if err != nil {
@@ -157,6 +167,8 @@ func (c *Controller) CreateSecret(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+// DeleteSecret handles HTTP DELETE /secret. Requires JWT auth. Parses title from body.
+// Returns 404 for non-existent secrets belonging to user.
 func (c *Controller) DeleteSecret(w http.ResponseWriter, r *http.Request) {
 	tokenInfo := auth.GetTokenInfo[model.TokenInfo](r)
 
