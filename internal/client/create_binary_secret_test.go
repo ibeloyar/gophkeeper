@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/charmbracelet/bubbles/textinput"
@@ -76,7 +77,7 @@ func TestApp_UpdateCreateBinarySecret_TitleRequired(t *testing.T) {
 	assert.True(t, ok)
 
 	assert.Equal(t, secretBinaryCreateState, newApp.state)
-	assert.Contains(t, newApp.createBinarySecretModel.err.Error(), "failed to open file")
+	assert.Contains(t, newApp.createBinarySecretModel.err.Error(), "sandbox init: openat")
 	assert.Nil(t, cmd)
 }
 
@@ -99,12 +100,14 @@ func TestApp_UpdateCreateBinarySecret_NoSuchFile(t *testing.T) {
 	assert.True(t, ok)
 
 	assert.Equal(t, secretBinaryCreateState, newApp.state)
-	assert.Contains(t, newApp.createBinarySecretModel.err.Error(), "no such file or directory")
+	assert.Contains(t, newApp.createBinarySecretModel.err.Error(), "sandbox init: openat : empty path")
 	assert.Nil(t, cmd)
 }
 
 func TestApp_UpdateCreateBinarySecret_ValidInput(t *testing.T) {
-	tmpFile, err := os.CreateTemp("", "testfile")
+	exePath, _ := os.Executable()
+
+	tmpFile, err := os.Create(filepath.Join(filepath.Dir(exePath), "testfile"))
 	assert.NoError(t, err)
 	defer os.Remove(tmpFile.Name())
 	defer tmpFile.Close()
@@ -127,7 +130,7 @@ func TestApp_UpdateCreateBinarySecret_ValidInput(t *testing.T) {
 
 	a.createBinarySecretModel.title.SetValue("test-title")
 	a.createBinarySecretModel.metadata.SetValue("test-meta")
-	a.createBinarySecretModel.filePath.SetValue(tmpFile.Name())
+	a.createBinarySecretModel.filePath.SetValue("testfile")
 
 	newModel, cmd := a.updateCreateBinarySecret(tea.KeyMsg{Type: tea.KeyEnter})
 

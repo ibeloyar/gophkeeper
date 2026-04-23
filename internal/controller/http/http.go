@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/ibeloyar/gophkeeper/internal/model"
-	"github.com/ibeloyar/gophkeeper/pgk/auth"
+	"github.com/ibeloyar/gophkeeper/pkg/auth"
 	"go.uber.org/zap"
 )
 

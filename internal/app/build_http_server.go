@@ -7,7 +7,7 @@ import (
 	"github.com/ibeloyar/gophkeeper/internal/config"
 	"github.com/ibeloyar/gophkeeper/internal/model"
 	"github.com/ibeloyar/gophkeeper/internal/service"
-	"github.com/ibeloyar/gophkeeper/pgk/auth"
+	"github.com/ibeloyar/gophkeeper/pkg/auth"
 	"go.uber.org/zap"
 
 	httpController "github.com/ibeloyar/gophkeeper/internal/controller/http"

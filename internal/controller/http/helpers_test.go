@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ibeloyar/gophkeeper/pgk/logger"
+	"github.com/ibeloyar/gophkeeper/pkg/logger"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"

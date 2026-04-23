@@ -6,7 +6,7 @@ import (
 	"runtime/debug"
 
 	"github.com/ibeloyar/gophkeeper/internal/model"
-	"github.com/ibeloyar/gophkeeper/pgk/auth"
+	"github.com/ibeloyar/gophkeeper/pkg/auth"
 	gophkeeperv1 "github.com/ibeloyar/gophkeeper/proto/gophkeeper/v1"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"

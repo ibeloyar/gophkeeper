@@ -3,7 +3,7 @@ package app
 import (
 	"github.com/ibeloyar/gophkeeper/internal/model"
 	"github.com/ibeloyar/gophkeeper/internal/service"
-	"github.com/ibeloyar/gophkeeper/pgk/auth"
+	"github.com/ibeloyar/gophkeeper/pkg/auth"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"

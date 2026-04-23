@@ -10,7 +10,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/ibeloyar/gophkeeper/internal/model"
 	"github.com/ibeloyar/gophkeeper/internal/repository/pgstorage"
-	"github.com/ibeloyar/gophkeeper/pgk/password"
+	"github.com/ibeloyar/gophkeeper/pkg/password"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zaptest"

@@ -121,13 +121,13 @@ build                  | build server
 ### Последнее тестовое покрытие
 ```
 go tool cover -func=coverage.filtered.out
-github.com/ibeloyar/gophkeeper/cmd/server/gophkeeper.go:11:                     main                            0.0%
+github.com/ibeloyar/gophkeeper/cmd/server/gophkeeper.go:10:                     main                            0.0%
 github.com/ibeloyar/gophkeeper/internal/app/app.go:27:                          Run                             0.0%
 github.com/ibeloyar/gophkeeper/internal/app/build_grpc_server.go:17:            buildGRPCServer                 100.0%
-github.com/ibeloyar/gophkeeper/internal/app/build_http_server.go:17:            buildHTTPServer                 85.0%
+github.com/ibeloyar/gophkeeper/internal/app/build_http_server.go:17:            buildHTTPServer                 70.0%
 github.com/ibeloyar/gophkeeper/internal/client/config/config.go:23:             Read                            100.0%
-github.com/ibeloyar/gophkeeper/internal/client/create_binary_secret.go:29:      updateCreateBinarySecret        47.6%
-github.com/ibeloyar/gophkeeper/internal/client/create_binary_secret.go:138:     createBinarySecretView          88.9%
+github.com/ibeloyar/gophkeeper/internal/client/create_binary_secret.go:30:      updateCreateBinarySecret        47.8%
+github.com/ibeloyar/gophkeeper/internal/client/create_binary_secret.go:145:     createBinarySecretView          88.9%
 github.com/ibeloyar/gophkeeper/internal/client/create_card_secret.go:31:        updateCreateCardSecret          36.6%
 github.com/ibeloyar/gophkeeper/internal/client/create_card_secret.go:149:       createCardSecretView            90.9%
 github.com/ibeloyar/gophkeeper/internal/client/create_log_pass_secret.go:29:    updateCreateLogPassSecret       38.3%
@@ -152,7 +152,7 @@ github.com/ibeloyar/gophkeeper/internal/client/secret_delete.go:50:             
 github.com/ibeloyar/gophkeeper/internal/client/secrets.go:22:                   pollSecrets                     50.0%
 github.com/ibeloyar/gophkeeper/internal/client/secrets.go:31:                   updateSecrets                   90.2%
 github.com/ibeloyar/gophkeeper/internal/client/secrets.go:107:                  secretsView                     100.0%
-github.com/ibeloyar/gophkeeper/internal/config/config.go:38:                    Read                            100.0%
+github.com/ibeloyar/gophkeeper/internal/config/config.go:43:                    Read                            91.7%
 github.com/ibeloyar/gophkeeper/internal/controller/grpc/convert.go:13:          convertSecretTypeToProto        100.0%
 github.com/ibeloyar/gophkeeper/internal/controller/grpc/convert.go:28:          convertSecretTypeToDTO          100.0%
 github.com/ibeloyar/gophkeeper/internal/controller/grpc/convert.go:46:          convertCreateSecretToDTO        80.0%
@@ -195,20 +195,19 @@ github.com/ibeloyar/gophkeeper/internal/service/validate.go:31:                 
 github.com/ibeloyar/gophkeeper/internal/service/validate.go:43:                 validateLogin                   100.0%
 github.com/ibeloyar/gophkeeper/internal/service/validate.go:51:                 validatePassword                100.0%
 github.com/ibeloyar/gophkeeper/internal/service/validate.go:59:                 validateCreateSecretDTO         100.0%
-github.com/ibeloyar/gophkeeper/pgk/auth/auth.go:33:                             GenerateBearerToken             80.0%
-github.com/ibeloyar/gophkeeper/pgk/auth/auth.go:53:                             VerifyJWTBearerToken            80.0%
-github.com/ibeloyar/gophkeeper/pgk/auth/auth.go:83:                             AuthBearerMiddlewareInit        100.0%
-github.com/ibeloyar/gophkeeper/pgk/auth/auth.go:100:                            GetTokenInfo                    100.0%
-github.com/ibeloyar/gophkeeper/pgk/auth/auth.go:113:                            GetTokenInfoFromContext         100.0%
-github.com/ibeloyar/gophkeeper/pgk/auth/auth.go:125:                            AuthGRPCUnaryInterceptor        100.0%
-github.com/ibeloyar/gophkeeper/pgk/logger/logger.go:13:                         New                             85.7%
-github.com/ibeloyar/gophkeeper/pgk/logger/logger.go:28:                         LoggingMiddleware               100.0%
-github.com/ibeloyar/gophkeeper/pgk/logger/logger.go:68:                         Write                           100.0%
-github.com/ibeloyar/gophkeeper/pgk/logger/logger.go:76:                         WriteHeader                     100.0%
-github.com/ibeloyar/gophkeeper/pgk/password/password.go:24:                     HashPassword                    100.0%
-github.com/ibeloyar/gophkeeper/pgk/password/password.go:42:                     CheckPasswordHash               100.0%
-github.com/ibeloyar/gophkeeper/pgk/password/password.go:50:                     EncryptPassword                 84.2%
-github.com/ibeloyar/gophkeeper/pgk/password/password.go:87:                     DecryptPassword                 90.0%
-total:                                                                          (statements)                    70.4%
-rm coverage.out coverage.filtered.out
+github.com/ibeloyar/gophkeeper/pkg/auth/auth.go:33:                             GenerateBearerToken             80.0%
+github.com/ibeloyar/gophkeeper/pkg/auth/auth.go:53:                             VerifyJWTBearerToken            80.0%
+github.com/ibeloyar/gophkeeper/pkg/auth/auth.go:83:                             AuthBearerMiddlewareInit        100.0%
+github.com/ibeloyar/gophkeeper/pkg/auth/auth.go:100:                            GetTokenInfo                    100.0%
+github.com/ibeloyar/gophkeeper/pkg/auth/auth.go:113:                            GetTokenInfoFromContext         100.0%
+github.com/ibeloyar/gophkeeper/pkg/auth/auth.go:125:                            AuthGRPCUnaryInterceptor        100.0%
+github.com/ibeloyar/gophkeeper/pkg/logger/logger.go:13:                         New                             85.7%
+github.com/ibeloyar/gophkeeper/pkg/logger/logger.go:28:                         LoggingMiddleware               100.0%
+github.com/ibeloyar/gophkeeper/pkg/logger/logger.go:68:                         Write                           100.0%
+github.com/ibeloyar/gophkeeper/pkg/logger/logger.go:76:                         WriteHeader                     100.0%
+github.com/ibeloyar/gophkeeper/pkg/password/password.go:24:                     HashPassword                    100.0%
+github.com/ibeloyar/gophkeeper/pkg/password/password.go:42:                     CheckPasswordHash               100.0%
+github.com/ibeloyar/gophkeeper/pkg/password/password.go:50:                     EncryptPassword                 84.2%
+github.com/ibeloyar/gophkeeper/pkg/password/password.go:87:                     DecryptPassword                 90.0%
+total:                                                                          (statements)                    70.0%
 ```

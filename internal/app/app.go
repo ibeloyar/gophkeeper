@@ -15,7 +15,7 @@ import (
 	"github.com/ibeloyar/gophkeeper/internal/model"
 	"github.com/ibeloyar/gophkeeper/internal/repository/pgstorage"
 	"github.com/ibeloyar/gophkeeper/internal/service"
-	"github.com/ibeloyar/gophkeeper/pgk/logger"
+	"github.com/ibeloyar/gophkeeper/pkg/logger"
 )
 
 const (

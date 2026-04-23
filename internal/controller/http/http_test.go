@@ -14,7 +14,7 @@ import (
 	"github.com/ibeloyar/gophkeeper/internal/model"
 	"github.com/ibeloyar/gophkeeper/internal/repository/pgstorage"
 	"github.com/ibeloyar/gophkeeper/internal/service"
-	"github.com/ibeloyar/gophkeeper/pgk/auth"
+	"github.com/ibeloyar/gophkeeper/pkg/auth"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
