@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/pkg/errors"
@@ -48,9 +49,15 @@ func (a app) updateCreateBinarySecret(msg tea.Msg) (tea.Model, tea.Cmd) {
 				a.createBinarySecretModel.err = errors.New("file path is required")
 			}
 
-			f, err := os.Open(a.createBinarySecretModel.filePath.Value())
+			exePath, err := os.Executable()
 			if err != nil {
-				a.createBinarySecretModel.err = fmt.Errorf("failed to open file: %w", err)
+				a.createBinarySecretModel.err = fmt.Errorf("sandbox init: %w", err)
+				return a, cmd
+			}
+
+			f, err := os.OpenInRoot(filepath.Dir(exePath), a.createBinarySecretModel.filePath.Value())
+			if err != nil {
+				a.createBinarySecretModel.err = fmt.Errorf("sandbox init: %w", err)
 				return a, cmd
 			}
 			defer f.Close()
