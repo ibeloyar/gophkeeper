@@ -23,6 +23,7 @@ var (
 	ErrServerInternal           = errors.New(ErrInternalServerMessage)
 	ErrUserAlreadyExist         = errors.New(ErrUserAlreadyExistMessage)
 	ErrInvalidLoginOrPassword   = errors.New(ErrInvalidLoginOrPasswordMessage)
+	ErrGRPCServerBuild          = errors.New("building grpc server error")
 	ErrListeningToLocalAddress  = errors.New("listening to local address error")
 	ErrStartingGrpcServer       = errors.New("starting grpc server error")
 	ErrConfigFileReading        = errors.New("config file read error")

@@ -45,11 +45,14 @@ func Run(cfg *config.Config) error {
 	)
 
 	grpcServer, err := buildGRPCServer(lg, appService, cfg.Security.TokenSecret)
+	if err != nil {
+		lg.Errorf("%s: %s", model.ErrGRPCServerBuild, err)
+		return err
+	}
 
 	grpcListener, err := net.Listen("tcp", cfg.GrpcServer.Addr)
 	if err != nil {
 		lg.Errorf("%s: %s", model.ErrListeningToLocalAddress, err)
-
 		return err
 	}
 
