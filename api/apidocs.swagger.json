@@ -1,0 +1,516 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "gophkeeper.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "Gophkeeper"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/v1/create-secret": {
+      "post": {
+        "description": "Creates a secret for the user. Requires `Authorization` in gRPC metadata / for HTTP in headers",
+        "operationId": "Gophkeeper_CreateSecret",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CreateSecretResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateSecretRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Gophkeeper"
+        ]
+      }
+    },
+    "/api/v1/delete-secret": {
+      "post": {
+        "description": "Get a secrets for the user. Requires `Authorization` in gRPC metadata / for HTTP in headers",
+        "operationId": "Gophkeeper_DeleteSecret",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DeleteSecretResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1DeleteSecretRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Gophkeeper"
+        ]
+      }
+    },
+    "/api/v1/get-secret": {
+      "post": {
+        "description": "Get a secret for the user. Requires `Authorization` in gRPC metadata / for HTTP in headers",
+        "operationId": "Gophkeeper_GetSecret",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetSecretResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1GetSecretRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Gophkeeper"
+        ]
+      }
+    },
+    "/api/v1/get-secrets": {
+      "post": {
+        "description": "Get a secrets for the user. Requires `Authorization` in gRPC metadata / for HTTP in headers",
+        "operationId": "Gophkeeper_GetSecrets",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetSecretsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1GetSecretsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Gophkeeper"
+        ]
+      }
+    },
+    "/api/v1/login": {
+      "post": {
+        "operationId": "Gophkeeper_Login",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1LoginResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1LoginRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Gophkeeper"
+        ]
+      }
+    },
+    "/api/v1/register": {
+      "post": {
+        "operationId": "Gophkeeper_Register",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1RegisterResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1RegisterRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Gophkeeper"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1CreateSecretRequest": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "example": "title"
+        },
+        "secret_type": {
+          "$ref": "#/definitions/v1SecretType",
+          "example": "login_password|text|binary|card"
+        },
+        "metadata": {
+          "type": "string",
+          "example": "site addr.ru",
+          "title": "custom key-value data"
+        },
+        "login": {
+          "type": "string",
+          "example": "login",
+          "title": "login_password"
+        },
+        "password": {
+          "type": "string",
+          "example": "password"
+        },
+        "text_data": {
+          "type": "string",
+          "example": "text data",
+          "title": "text"
+        },
+        "binary_data": {
+          "type": "string",
+          "format": "byte",
+          "example": "AQIDBAUG",
+          "title": "binary"
+        },
+        "card_number": {
+          "type": "string",
+          "example": "4111111111111111",
+          "title": "card"
+        },
+        "card_exp": {
+          "type": "string",
+          "example": "12/27"
+        },
+        "card_holder": {
+          "type": "string",
+          "example": "IVAN IVANOV"
+        }
+      }
+    },
+    "v1CreateSecretResponse": {
+      "type": "object"
+    },
+    "v1DeleteSecretRequest": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "example": "title"
+        }
+      }
+    },
+    "v1DeleteSecretResponse": {
+      "type": "object"
+    },
+    "v1GetSecretRequest": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "example": "title"
+        }
+      }
+    },
+    "v1GetSecretResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64",
+          "example": "1"
+        },
+        "user_id": {
+          "type": "string",
+          "format": "int64",
+          "example": "1"
+        },
+        "title": {
+          "type": "string",
+          "example": "title"
+        },
+        "created_at": {
+          "type": "string",
+          "example": "2026-04-16T15:44:00+03:00"
+        },
+        "updated_at": {
+          "type": "string",
+          "example": "2026-04-16T15:44:00+03:00"
+        },
+        "metadata": {
+          "type": "string",
+          "example": "site addr.ru"
+        },
+        "secret_type": {
+          "$ref": "#/definitions/v1SecretType",
+          "example": "login_password|text|binary|card"
+        },
+        "login": {
+          "type": "string",
+          "example": "login",
+          "title": "login_password"
+        },
+        "password": {
+          "type": "string",
+          "example": "password"
+        },
+        "text_data": {
+          "type": "string",
+          "example": "text data",
+          "title": "text"
+        },
+        "binary_data": {
+          "type": "string",
+          "format": "byte",
+          "example": "AQIDBAUG",
+          "title": "binary"
+        },
+        "card_number": {
+          "type": "string",
+          "example": "4111111111111111",
+          "title": "card"
+        },
+        "card_exp": {
+          "type": "string",
+          "example": "12/27"
+        },
+        "card_holder": {
+          "type": "string",
+          "example": "IVAN IVANOV"
+        }
+      }
+    },
+    "v1GetSecretsRequest": {
+      "type": "object"
+    },
+    "v1GetSecretsResponse": {
+      "type": "object",
+      "properties": {
+        "secrets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Secret"
+          }
+        }
+      }
+    },
+    "v1LoginRequest": {
+      "type": "object",
+      "properties": {
+        "login": {
+          "type": "string",
+          "example": "login"
+        },
+        "password": {
+          "type": "string",
+          "example": "12pass!"
+        }
+      }
+    },
+    "v1LoginResponse": {
+      "type": "object"
+    },
+    "v1RegisterRequest": {
+      "type": "object",
+      "properties": {
+        "login": {
+          "type": "string",
+          "example": "login"
+        },
+        "password": {
+          "type": "string",
+          "example": "12pass!"
+        }
+      }
+    },
+    "v1RegisterResponse": {
+      "type": "object"
+    },
+    "v1Secret": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64",
+          "example": "1"
+        },
+        "user_id": {
+          "type": "string",
+          "format": "int64",
+          "example": "1"
+        },
+        "title": {
+          "type": "string",
+          "example": "title"
+        },
+        "created_at": {
+          "type": "string",
+          "example": "2026-04-16T15:44:00+03:00"
+        },
+        "updated_at": {
+          "type": "string",
+          "example": "2026-04-16T15:44:00+03:00"
+        },
+        "metadata": {
+          "type": "string",
+          "example": "site addr.ru"
+        },
+        "secret_type": {
+          "$ref": "#/definitions/v1SecretType",
+          "example": "login_password|text|binary|card"
+        },
+        "login": {
+          "type": "string",
+          "example": "login",
+          "title": "login_password"
+        },
+        "password": {
+          "type": "string",
+          "example": "password"
+        },
+        "text_data": {
+          "type": "string",
+          "example": "text data",
+          "title": "text"
+        },
+        "binary_data": {
+          "type": "string",
+          "format": "byte",
+          "example": "AQIDBAUG",
+          "title": "binary"
+        },
+        "card_number": {
+          "type": "string",
+          "example": "4111111111111111",
+          "title": "card"
+        },
+        "card_exp": {
+          "type": "string",
+          "example": "12/27"
+        },
+        "card_holder": {
+          "type": "string",
+          "example": "IVAN IVANOV"
+        }
+      },
+      "title": "Common"
+    },
+    "v1SecretType": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED",
+        "LOGIN_PASSWORD",
+        "TEXT",
+        "BINARY",
+        "CARD"
+      ],
+      "default": "UNSPECIFIED"
+    }
+  }
+}

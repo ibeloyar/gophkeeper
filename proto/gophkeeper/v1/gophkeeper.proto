@@ -1,0 +1,179 @@
+syntax = "proto3";
+
+package gophkeeper.v1;
+
+option go_package = "github.com/ibeloyar/gophkeeper/proto/gophkeeper/v1;gophkeeperv1";
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+service Gophkeeper {
+  rpc Register (RegisterRequest) returns (RegisterResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/register";
+      body: "*";
+    };
+  };
+
+  rpc Login (LoginRequest) returns (LoginResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/login";
+      body: "*";
+    };
+  };
+
+  rpc CreateSecret (CreateSecretRequest) returns (CreateSecretResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/create-secret";
+      body: "*";
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      description: "Creates a secret for the user. Requires `Authorization` in gRPC metadata / for HTTP in headers"
+    };
+  };
+
+  rpc GetSecret (GetSecretRequest) returns (GetSecretResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/get-secret";
+      body: "*";
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      description: "Get a secret for the user. Requires `Authorization` in gRPC metadata / for HTTP in headers"
+    };
+  };
+
+  rpc GetSecrets (GetSecretsRequest) returns (GetSecretsResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/get-secrets";
+      body: "*";
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      description: "Get a secrets for the user. Requires `Authorization` in gRPC metadata / for HTTP in headers"
+    };
+  };
+
+  rpc DeleteSecret (DeleteSecretRequest) returns (DeleteSecretResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/delete-secret";
+      body: "*";
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      description: "Get a secrets for the user. Requires `Authorization` in gRPC metadata / for HTTP in headers"
+    };
+  };
+};
+
+message RegisterRequest {
+  string login = 1    [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field)={example:'"login"'}];
+  string password = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field)={example:'"12pass!"'}];
+}
+
+message RegisterResponse { }
+
+message LoginRequest {
+  string login = 1    [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field)={example:'"login"'}];
+  string password = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field)={example:'"12pass!"'}];
+}
+
+message LoginResponse { }
+
+message CreateSecretRequest {
+  string title = 1           [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field)={example:'"title"'}];
+
+  SecretType secret_type = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field)={example:'"login_password|text|binary|card"'}];
+
+  // custom key-value data
+  string metadata = 3        [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example: '"site addr.ru"'}];
+
+  // login_password
+  string login = 4           [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field)={example:'"login"'}];
+  string password = 5        [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field)={example:'"password"'}];
+
+  // text
+  string text_data = 6       [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field)={example:'"text data"'}];
+
+  // binary
+  bytes binary_data = 7      [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field)={example:'"AQIDBAUG"'}];
+
+  // card
+  string card_number = 8     [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field)={example:'"4111111111111111"'}];
+  string card_exp = 9        [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field)={example:'"12/27"'}];
+  string card_holder = 10    [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field)={example:'"IVAN IVANOV"'}];
+}
+
+message CreateSecretResponse { }
+
+message GetSecretRequest {
+  string title = 1           [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field)={example:'"title"'}];
+}
+
+message GetSecretResponse {
+  int64 id = 1                [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field)={example:'"1"'}];
+  int64 user_id = 2           [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field)={example:'"1"'}];
+  string title = 3            [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field)={example:'"title"'}];
+  string created_at = 4       [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field)={example:'"2026-04-16T15:44:00+03:00"'}];
+  string updated_at = 5       [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field)={example:'"2026-04-16T15:44:00+03:00"'}];
+  string metadata = 6         [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example:'"site addr.ru"'}];
+  SecretType secret_type = 7  [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field)={example:'"login_password|text|binary|card"'}];
+
+  // login_password
+  string login = 8            [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field)={example:'"login"'}];
+  string password = 9         [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field)={example:'"password"'}];
+
+  // text
+  string text_data = 10       [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field)={example:'"text data"'}];
+
+  // binary
+  bytes binary_data = 11      [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field)={example:'"AQIDBAUG"'}];
+
+  // card
+  string card_number = 12     [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field)={example:'"4111111111111111"'}];
+  string card_exp = 13        [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field)={example:'"12/27"'}];
+  string card_holder = 14     [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field)={example:'"IVAN IVANOV"'}];
+}
+
+message GetSecretsRequest { }
+
+message GetSecretsResponse {
+  repeated Secret secrets = 1;
+}
+
+message DeleteSecretRequest {
+  string title = 1  [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field)={example:'"title"'}];
+}
+
+message DeleteSecretResponse { }
+
+// Common
+message Secret {
+  int64 id = 1                [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field)={example:'"1"'}];
+  int64 user_id = 2           [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field)={example:'"1"'}];
+  string title = 3            [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field)={example:'"title"'}];
+  string created_at = 4       [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field)={example:'"2026-04-16T15:44:00+03:00"'}];
+  string updated_at = 5       [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field)={example:'"2026-04-16T15:44:00+03:00"'}];
+  string metadata = 6         [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {example:'"site addr.ru"'}];
+  SecretType secret_type = 7  [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field)={example:'"login_password|text|binary|card"'}];
+
+  // login_password
+  string login = 8            [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field)={example:'"login"'}];
+  string password = 9         [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field)={example:'"password"'}];
+
+  // text
+  string text_data = 10       [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field)={example:'"text data"'}];
+
+  // binary
+  bytes binary_data = 11      [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field)={example:'"AQIDBAUG"'}];
+
+  // card
+  string card_number = 12     [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field)={example:'"4111111111111111"'}];
+  string card_exp = 13        [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field)={example:'"12/27"'}];
+  string card_holder = 14     [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field)={example:'"IVAN IVANOV"'}];
+}
+
+enum SecretType {
+  UNSPECIFIED = 0;
+  LOGIN_PASSWORD = 1;
+  TEXT = 2;
+  BINARY = 3;
+  CARD = 4;
+}
